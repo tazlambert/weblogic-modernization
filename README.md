@@ -57,16 +57,16 @@ After the proxy configuration double click the **Update** icon and wait until th
 
 ### The topics to be covered in this hands-on session are: ###
 
-0. [Setup Oracle Kubernetes Engine instance on Oracle Cloud Infrastructure.](setup.oke.md)
-1. [Create Oracle Container Pipelines Application to Build Custom WebLogic Domain Image](build.weblogic.image.pipeline.md)
-2. [Install WebLogic Operator](install.operator.md)
-3. [Install Traefik Software Loadbalancer](install.traefik.md)
-4. [Deploy WebLogic Domain](deploy.weblogic.md)
-5. [Scaling WebLogic Cluster](scale.weblogic.md)
-6. [Override JDBC Datasource parameters](override.jdbc.md)
-7. [Update Web Application](update.application.md)
-8. [Assigning WebLogic Pods to Nodes](node.selector.md)
-9. [Assigning WebLogic Pods to Licensed Nodes](node.selector.license.md)
+0. [Setup Oracle Kubernetes Engine instance on Oracle Cloud Infrastructure.](tutorials/setup.oke.md)
+1. [Create Oracle Container Pipelines Application to Build Custom WebLogic Domain Image](tutorials/build.weblogic.image.pipeline.md)
+2. [Install WebLogic Operator](tutorials/install.operator.md)
+3. [Install Traefik Software Loadbalancer](tutorials/install.traefik.md)
+4. [Deploy WebLogic Domain](tutorials/deploy.weblogic.md)
+5. [Scaling WebLogic Cluster](tutorials/scale.weblogic.md)
+6. [Override JDBC Datasource parameters](tutorials/override.jdbc.md)
+7. [Update Web Application](tutorials/update.application.md)
+8. [Assigning WebLogic Pods to Nodes](tutorials/node.selector.md)
+9. [Assigning WebLogic Pods to Licensed Nodes](tutorials/node.selector.license.md)
 
 ### License ###
 Copyright (c) 2020 Oracle and/or its affiliates
