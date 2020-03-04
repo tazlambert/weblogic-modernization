@@ -1,0 +1,22 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: traefik-pathrouting-1
+  namespace: wls-k8s-domain-ns
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    #ingress.kubernetes.io/rewrite-target: /
+    #ingress.kubernetes.io/rule-type: PathPrefix
+spec:
+  rules:
+  - host:
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: wls-k8s-domain-cluster-cluster-1
+          servicePort: 8001
+      - path: /console
+        backend:
+          serviceName: wls-k8s-domain-admin-server
+          servicePort: 7001
