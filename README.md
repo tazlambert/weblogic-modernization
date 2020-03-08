@@ -2,7 +2,7 @@
 
 ### About this hands-on tutorial ###
 
-This tutorial is made based on the original [Weblogic Operator Tutorial](https://github.com/nagypeter/weblogic-operator-tutorial)
+This tutorial is made based on the original [Weblogic Operator Tutorial](https://github.com/nagypeter/weblogic-operator-tutorial) and has been tested by March 2020.
 
 This tutorial demonstrates how to deploy and run WebLogic Domain on Kubernetes Cluster using [Oracle WebLogic Server Kubernetes Operator](https://github.com/oracle/weblogic-kubernetes-operator).
 
