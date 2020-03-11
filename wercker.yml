@@ -23,7 +23,7 @@ build-domain-in-home-image:
         name: Build docker image
         code: |
               docker login $REGION.ocir.io -u $TENANCY/$OCI_REGISTRY_USERNAME -p $OCI_REGISTRY_PASSWORD
-              if docker pull $REGION.ocir.io/$TENANCY/$WERCKER_APPLICATION_NAME:latest; then
+              if docker pull phx.ocir.io/axseivdauftz/weblogic-operator-tutorial:latest; then
                 docker build --file Dockerfile.update \
                     --build-arg SOURCEIMAGE=$REGION.ocir.io/$TENANCY/$WERCKER_APPLICATION_NAME:latest \
                     --force-rm=true \
