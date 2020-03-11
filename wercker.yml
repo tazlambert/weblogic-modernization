@@ -15,7 +15,7 @@ build-domain-in-home-image:
   steps:
     - script:
         name: Install docker
-        code: apk --no-cache add docker
+        code: apk --no-cache add --update docker openrc
     - script:
         name: Install curl
         code: apk --no-cache add curl
@@ -23,7 +23,6 @@ build-domain-in-home-image:
         name: Build docker image
         code: |
               docker login $REGION.ocir.io -u $TENANCY/$OCI_REGISTRY_USERNAME -p $OCI_REGISTRY_PASSWORD
-              echo docker test pull
               if docker pull $REGION.ocir.io/$TENANCY/$WERCKER_APPLICATION_NAME:latest; then
                 docker build --file Dockerfile.update \
                     --build-arg SOURCEIMAGE=$REGION.ocir.io/$TENANCY/$WERCKER_APPLICATION_NAME:latest \
