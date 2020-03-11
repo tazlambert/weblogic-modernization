@@ -22,6 +22,8 @@ build-domain-in-home-image:
     - script:
         name: Explore the docker daemon 
         code: |
+              echo start docker
+              sudo service docker start
               echo Running docker version
               sudo docker version
               echo running docker ps
