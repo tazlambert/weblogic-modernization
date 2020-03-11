@@ -10,8 +10,7 @@ build-domain-in-home-image:
   box:
       id: alpine
       cmd: /bin/sh
-      docker: true
-      
+  docker: true
   steps:
     - script:
         name: Install docker curl
