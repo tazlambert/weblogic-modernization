@@ -9,8 +9,8 @@ build:
 build-domain-in-home-image:
   box:
       id: alpine
-      docker: true
       cmd: /bin/sh
+      docker: true
       
   steps:
     - script:
