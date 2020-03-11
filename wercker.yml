@@ -14,11 +14,11 @@ build-domain-in-home-image:
       
   steps:
     - script:
-        name: Install docker
-        code: apk --no-cache add --update docker openrc | rc-update add docker boot
+        name: Install docker curl
+        code: apk --no-cache add docker curl openrc
     - script:
-        name: Install curl
-        code: apk --no-cache add curl
+        name: Install rc-update
+        code: rc-update add docker boot
     - script:
         name: Build docker image
         code: |
