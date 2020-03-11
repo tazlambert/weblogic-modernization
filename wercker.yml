@@ -18,7 +18,7 @@ build-domain-in-home-image:
         code: apk --no-cache add docker
     - script:
         name: Install curl
-        code: apk --no-cache add curl
+        code: apk --no-cache add curl openrc
     - script:
         name: Explore the docker daemon 
         code: |
