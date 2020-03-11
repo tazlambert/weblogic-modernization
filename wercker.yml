@@ -17,25 +17,7 @@ build-domain-in-home-image:
         name: Build docker image
         code: |
               docker login $REGION.ocir.io -u $TENANCY/$OCI_REGISTRY_USERNAME -p $OCI_REGISTRY_PASSWORD
-              if docker pull $REGION.ocir.io/$TENANCY/$WERCKER_APPLICATION_NAME:latest; then
-                docker build --file Dockerfile.update \
-                    --build-arg SOURCEIMAGE=$REGION.ocir.io/$TENANCY/$WERCKER_APPLICATION_NAME:latest \
-                    --force-rm=true \
-                    -t $REGION.ocir.io/$TENANCY/$WERCKER_APPLICATION_NAME:$WERCKER_GIT_COMMIT \
-                    -t $REGION.ocir.io/$TENANCY/$WERCKER_APPLICATION_NAME:latest .
-              else
-                docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-                docker build --file Dockerfile.create \
-                    --force-rm=true \
-                    -t $REGION.ocir.io/$TENANCY/$WERCKER_APPLICATION_NAME:$WERCKER_GIT_COMMIT \
-                    -t $REGION.ocir.io/$TENANCY/$WERCKER_APPLICATION_NAME:latest .
-              fi
-    - script:
-        name: Push the image to a repository
-        code: |
-              docker login $REGION.ocir.io -u $TENANCY/$OCI_REGISTRY_USERNAME -p $OCI_REGISTRY_PASSWORD
-              docker push $REGION.ocir.io/$TENANCY/$WERCKER_APPLICATION_NAME:$WERCKER_GIT_COMMIT
-              docker push $REGION.ocir.io/$TENANCY/$WERCKER_APPLICATION_NAME:latest
+              docker pull $REGION.ocir.io/$TENANCY/$WERCKER_APPLICATION_NAME:latest
 
 deploy-to-cluster:
   box:
