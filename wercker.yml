@@ -22,7 +22,6 @@ build-domain-in-home-image:
     - script:
         name: Build docker image
         code: |
-              echo docker login
               docker login $REGION.ocir.io -u $TENANCY/$OCI_REGISTRY_USERNAME -p $OCI_REGISTRY_PASSWORD
               echo docker test pull
               if docker pull $REGION.ocir.io/$TENANCY/$WERCKER_APPLICATION_NAME:latest; then
