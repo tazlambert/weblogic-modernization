@@ -22,6 +22,10 @@ build-domain-in-home-image:
     - script:
         name: Explore the docker daemon 
         code: |
+              echo apk update
+              sudo apk update
+              echo add docker daemon boot start
+              sudo rc-update add docker boot
               echo start docker
               sudo service docker start
               echo Running docker version
