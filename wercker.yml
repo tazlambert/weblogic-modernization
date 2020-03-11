@@ -22,12 +22,8 @@ build-domain-in-home-image:
     - script:
         name: Explore the docker daemon 
         code: |
-              echo apk update
-              sudo apk update
-              echo stop docker daemon
-              sudo service docker stop
-              echo start docker daemon
-              sudo service docker start
+              echo show docker daemon status
+              sudo service docker status
               echo Running docker version
               sudo docker version
               echo running docker ps
