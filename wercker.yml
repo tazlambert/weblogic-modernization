@@ -7,10 +7,10 @@ build:
         code: mvn clean package
 
 build-domain-in-home-image:
-  docker: true
   box:
       id: alpine
       cmd: /bin/sh
+  docker: true
   steps:
     - script:
         name: Install docker curl
