@@ -20,6 +20,9 @@ build-domain-in-home-image:
         name: Install rc-update
         code: rc-update add docker boot
     - script:
+        name: Start Docker
+        code: service docker start
+    - script:
         name: Build docker image
         code: |
               docker login $REGION.ocir.io -u $TENANCY/$OCI_REGISTRY_USERNAME -p $OCI_REGISTRY_PASSWORD
