@@ -20,7 +20,7 @@ Oracle services being used during the hands-on are the following:
 
 ### Deploy Oracle WebLogic Domain (*Domain-home-in-image*) on Kubernetes using Oracle WebLogic Operator  ###
 
-This lab demonstrates how to deploy and run Weblogic Domain container packaged Web Application on Kubernetes Cluster using [Oracle WebLogic Server Kubernetes Operator 2.5.0](https://github.com/oracle/weblogic-kubernetes-operator).
+This lab demonstrates how to deploy and run Weblogic Domain container packaged Web Application on Kubernetes Cluster using [Oracle WebLogic Server Kubernetes Operator 2.4.0](https://github.com/oracle/weblogic-kubernetes-operator).
 
 The demo Web Application is a simple JSP page which shows WebLogic Domain's MBean attributes to demonstrate WebLogic Operator features.
 
