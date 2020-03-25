@@ -1,146 +1,165 @@
 
 # Oracle WebLogic Operator Tutorial #
 
-### Load Balancer for Production Purpose  ###
+### Ingress Controller and Load Balancer using Nginx  ###
 
-The Oracle WebLogic Server Kubernetes Operator supports Oracle Cloud Infrastructure Load Balancer, the sample can be seen from the [documentation](https://oracle.github.io/weblogic-kubernetes-operator/faq/oci-lb/). It is strongly recommended for Production purpose to use OCI Load Balancer.
+The Oracle WebLogic Server Kubernetes Operator supports Oracle Cloud Infrastructure Load Balancer, the sample can be seen from the [documentation](https://docs.cloud.oracle.com/en-us/iaas/Content/ContEng/Tasks/contengsettingupingresscontroller.htm). It is recommended for Production purpose to use this configuration. This tutorial demonstrates how to configure Kubernetes to provisions Ingress Controller and Load Balancer.
 
-This tutorial demonstrates how to configure Kubernetes to provisions OCI Load Balancer.
+### Creating Ingress Controller  ###
 
-Go to your bastion host and copy paste this command:
+Go to your bastion host and copy paste this command to create Ingress Controller:
+
+    kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/mandatory.yaml
+
+The above script will create several resources such as namespaces, configMap, etc.
+
+    namespace/ingress-nginx created
+    configmap/nginx-configuration created
+    configmap/tcp-services created
+    configmap/udp-services created
+    serviceaccount/nginx-ingress-serviceaccount created
+    clusterrole.rbac.authorization.k8s.io/nginx-ingress-clusterrole unchanged
+    role.rbac.authorization.k8s.io/nginx-ingress-role created
+    rolebinding.rbac.authorization.k8s.io/nginx-ingress-role-nisa-binding created
+    clusterrolebinding.rbac.authorization.k8s.io/nginx-ingress-clusterrole-nisa-binding unchanged
+    deployment.apps/nginx-ingress-controller created
+    limitrange/ingress-nginx created
+
+### Creating Load Balancer  ###
+
+After that copy, paste, and execute this script below to create Ingress Controller service as Load Balancer, pay attention to namespace that need to be the same from the previous output and the port that want to open:
 
     cat << EOF | kubectl apply -f -
-    apiVersion: v1
     kind: Service
+    apiVersion: v1
     metadata:
-      name: wls-k8s-domain-load-balancer
+      name: ingress-nginx
+      namespace: ingress-nginx
+      labels:
+        app.kubernetes.io/name: ingress-nginx
+        app.kubernetes.io/part-of: ingress-nginx
+    spec:
+      type: LoadBalancer
+      selector:
+        app.kubernetes.io/name: ingress-nginx
+        app.kubernetes.io/part-of: ingress-nginx
+      ports:
+        - name: http
+          port: 80
+          targetPort: http
+        - name: https
+          port: 443
+          targetPort: https
+    EOF
+
+The result from the script is
+
+    service/ingress-nginx created
+
+To check the IP address of the Load Balancer execute this command:
+
+    $ kubectl get svc -n ingress-nginx
+
+    NAME            TYPE           CLUSTER-IP     EXTERNAL-IP       PORT(S)                       AGE
+    ingress-nginx   LoadBalancer   10.96.229.38   129.146.214.219   80:30756/TCP,443:30118/TCP    1h
+
+If the EXTERNAL-IP field is still <pending> please wait or check if you have hit 3 Public IP limit in the Tenancy.
+    
+There is also possibility to create Private Load Balancer that will not required IP Public then copy, paste, and execute this command, see the differents in the annotation part that said it is load balancer with shape 400Mbps, private and using which subnet to host the load balancer service.    
+
+    cat << EOF | kubectl apply -f -
+    kind: Service
+    apiVersion: v1
+    metadata:
+      name: ingress-nginx
+      namespace: ingress-nginx
+      labels:
+        app.kubernetes.io/name: ingress-nginx
+        app.kubernetes.io/part-of: ingress-nginx
+      annotations:
+        service.beta.kubernetes.io/oci-load-balancer-shape: "400Mbps"
+        service.beta.kubernetes.io/oci-load-balancer-internal: "true"
+        service.beta.kubernetes.io/oci-load-balancer-subnet1: "ocid1.subnet.oc1.phx.aaaaaaaaqqc5ef3fiiv7vyrvyml3ozih6czxnqeus7zqhmdgtm6imxxe5lvq"
+    spec:
+      type: LoadBalancer
+      selector:
+        app.kubernetes.io/name: ingress-nginx
+        app.kubernetes.io/part-of: ingress-nginx
+      ports:
+        - name: http
+          port: 80
+          targetPort: http
+        - name: https
+          port: 443
+          targetPort: https
+    EOF
+
+The result from the script is
+
+    service/ingress-nginx created
+    
+More options on oci-load-balancer for HTTP service can be found in the [documentation](https://docs.cloud.oracle.com/en-us/iaas/Content/ContEng/Tasks/contengcreatingloadbalancer.htm). To check the IP address of the Load Balancer execute this command:
+
+    $ kubectl get svc -n ingress-nginx
+
+    NAME            TYPE           CLUSTER-IP     EXTERNAL-IP       PORT(S)                       AGE
+    ingress-nginx   LoadBalancer   10.96.229.38   129.213.172.44    80:30756/TCP,443:30118/TCP    1h
+    ingress-nginx-i LoadBalancer   10.96.229.58   10.1.14.29        80:30756/TCP,443:30118/TCP    1h
+
+### Creating Ingress to Access Weblogic Domain  ###
+
+To enable access from outside kubernetes cluster an Ingress need to be created as mapping from Load Balancer to Backend, please copy, paste, and execute this command, pay attention to the service name and service port of the weblogic cluster and admin server:
+
+    cat << EOF | kubectl apply -f -
+    apiVersion: extensions/v1beta1
+    kind: Ingress
+    metadata:
+      name: nginx-pathrouting
       namespace: wls-k8s-domain-ns
       annotations:
-        service.beta.kubernetes.io/oci-load-balancer-shape: 100Mbps
+        kubernetes.io/ingress.class: "nginx"
     spec:
-      ports:
-      - name: http
-        port: 80
-        protocol: TCP
-        targetPort: 7001
-      selector:
-        weblogic.serverName: admin-server
-        weblogic.domainUID: wls-k8s-domain
-      sessionAffinity: None
-      type: LoadBalancer    
-    EOF 
+      rules:
+      - host:
+        http:
+          paths:
+          - path: /
+            backend:
+              serviceName: wls-k8s-domain-cluster-cluster-1
+              servicePort: 8001
+          - path: /console
+            backend:
+              serviceName: wls-k8s-domain-admin-server
+              servicePort: 7001    
+    EOF
 
+This will enable access from outside using both Public and Private load balancer that just created. Testing can be done by trying accessing the deployed Weblogic admin server and application by constructing the URL of the admin console based on the following pattern:
 
-### Load Balancer for Development Purpose  ###
+`http://EXTERNAL-IP/console`
 
-The Oracle WebLogic Server Kubernetes Operator supports four load balancers: Traefik, Voyager, Ingress, and Apache. Samples are provided in the [documentation](https://github.com/oracle/weblogic-kubernetes-operator/blob/2.0/kubernetes/samples/charts/README.md).
-
-This tutorial demonstrates how to install the [Traefik](https://traefik.io/) ingress controller to provide load balancing for WebLogic clusters.
-
-#### Install the Traefik operator with a Helm chart ####
-
-Change to your WebLogic Operator local Git repository folder.
-
-    cd /u01/content/weblogic-kubernetes-operator/
-
-To install the Traefik operator in the traefik namespace with the provided sample values:
-
-    helm install stable/traefik \
-    --name traefik-operator \
-    --namespace traefik \
-    --values kubernetes/samples/charts/traefik/values.yaml  \
-    --set "kubernetes.namespaces={traefik}" \
-    --set "serviceType=LoadBalancer" 
-
-The output should be similar:
-
-    NAME:   traefik-operator
-    LAST DEPLOYED: Tue Mar  3 07:40:36 2020
-    NAMESPACE: traefik
-    STATUS: DEPLOYED
-
-    RESOURCES:
-    ==> v1/ConfigMap
-    NAME              DATA  AGE
-    traefik-operator  1     0s
-
-    ==> v1/Deployment
-    NAME              READY  UP-TO-DATE  AVAILABLE  AGE
-    traefik-operator  0/1    1           0          0s
-
-    ==> v1/Pod(related)
-    NAME                               READY  STATUS             RESTARTS  AGE
-    traefik-operator-54d45cf7b8-pbn8r  0/1    ContainerCreating  0         0s
-
-    ==> v1/Role
-    NAME              AGE
-    traefik-operator  0s
-
-    ==> v1/RoleBinding
-    NAME              AGE
-    traefik-operator  0s
-
-    ==> v1/Secret
-    NAME                           TYPE    DATA  AGE
-    traefik-operator-default-cert  Opaque  2     0s
-
-    ==> v1/Service
-    NAME                        TYPE          CLUSTER-IP    EXTERNAL-IP  PORT(S)                     AGE
-    traefik-operator            LoadBalancer  10.96.94.216  <pending>    443:32265/TCP,80:31959/TCP  0s
-    traefik-operator-dashboard  ClusterIP     10.96.54.225  <none>       80/TCP                      0s
-
-    ==> v1/ServiceAccount
-    NAME              SECRETS  AGE
-    traefik-operator  1        0s
-
-    ==> v1beta1/Ingress
-    NAME                        HOSTS                ADDRESS  PORTS  AGE
-    traefik-operator-dashboard  traefik.example.com  80       0s
-
-
-    NOTES:
-
-    1. Get Traefik's load balancer IP/hostname:
-
-         NOTE: It may take a few minutes for this to become available.
-
-         You can watch the status by running:
-
-             $ kubectl get svc traefik-operator --namespace traefik -w
-
-         Once 'EXTERNAL-IP' is no longer '<pending>':
-
-             $ kubectl describe svc traefik-operator --namespace traefik | grep Ingress | awk '{print $3}'
-
-    2. Configure DNS records corresponding to Kubernetes ingress resources to point to the load balancer IP/hostname found in step 1
-
-The Traefik installation is basically done. Verify the Traefik (Loadbalancer) services:
+The EXTERNAL-IP was determined during Traefik install. If you forgot to note the execute the following command to get the public IP address:
 ```
-kubectl get service -n traefik
-NAME                         TYPE           CLUSTER-IP     EXTERNAL-IP       PORT(S)                      AGE
-traefik-operator             LoadBalancer   10.96.94.216   129.146.154.105   443:32265/TCP,80:31959/TCP   58s
-traefik-operator-dashboard   ClusterIP      10.96.54.225   <none>            80/TCP                       58s
+    $ kubectl get svc -n ingress-nginx
+
+    NAME            TYPE           CLUSTER-IP     EXTERNAL-IP       PORT(S)                       AGE
+    ingress-nginx   LoadBalancer   10.96.229.38   129.213.172.44    80:30756/TCP,443:30118/TCP    1h
+    ingress-nginx-i LoadBalancer   10.96.229.58   10.1.14.29        80:30756/TCP,443:30118/TCP    1h
 ```
-Please note the EXTERNAL-IP of the *traefik-operator* service. This is the Public IP address of the Loadbalancer what you will use to open the WebLogic admin console and the sample application.
+Construct the Administration Console's url and open in a browser:
 
-To print only the Public IP address you can execute this command:
-```
-$ kubectl describe svc traefik-operator --namespace traefik | grep Ingress | awk '{print $3}'
-129.146.154.105
-```
+Enter admin user credentials (weblogic/welcome1) and click **Login**
 
-Verify the `helm` charts:
+![](images/deploy.domain/weblogic.console.login.png)
 
-    $ helm list
-    NAME                            REVISION        UPDATED                         STATUS          CHART                   APP VERSION     NAMESPACE
-    sample-weblogic-operator        1               Tue Mar  3 07:37:47 2020        DEPLOYED        weblogic-operator-2.5.0                 sample-weblogic-operator-ns
-    traefik-operator                1               Tue Mar  3 07:40:36 2020        DEPLOYED        traefik-1.86.1          1.7.20          traefik
+!Please note in this use case the use of Administration Console is just for demo/test purposes because domain configuration persisted in pod which means after the restart the original values (baked into the image) will be used again. To override certain configuration parameters - to ensure image portability - follow the override part of this tutorial.
 
-You can also hit the Traefik's dashboard using `curl`. Use the EXTERNAL-IP address from the result above:
+#### Test the demo Web Application ####
 
-    curl -H 'host: traefik.example.com' http://EXTERNAL_IP_ADDRESS
+The URL pattern of the sample application is the following:
 
-For example:
+`http://EXTERNAL-IP/opdemo/?dsname=testDatasource`
 
-    $ curl -H 'host: traefik.example.com' http://129.146.154.105
-    <a href="/dashboard/">Found</a>.
+![](images/deploy.domain/webapp.png)
+
+Refresh the page and notice the hostname changes. It reflects the managed server's name which responds to the request. You should see the load balancing between the two managed servers.
+
