@@ -1,4 +1,4 @@
-# Welcome to Oracle WebLogic Operator Tutorial #
+# Welcome to Oracle WebLogic Move and Improve Tutorial #
 
 ### About this hands-on tutorial ###
 
