@@ -10,7 +10,7 @@ An operator is an application-specific controller that extends Kubernetes to cre
 Note! If you don't use the prepared VirtualBox desktop environment first clone the WebLogic Operator git repository to your desktop.
 ```
 sudo yum install git -y
-git clone https://github.com/oracle/weblogic-kubernetes-operator.git  -b release/2.4.0
+git clone https://github.com/oracle/weblogic-kubernetes-operator.git  -b release/2.5.0
 ```
 ---
 Before using helm install it using script https://helm.sh/docs/intro/install/ make sure to choose appropriate version, by sepcifying it in the command 
