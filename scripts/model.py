@@ -95,6 +95,14 @@ dep.setTargets(jarray.array([cl],TargetMBean))
 dep.setModuleType("war")
 dep.setSourcePath("wlsdeploy/applications/opdemo.war")
 
+# Deploy WLS Exporter tools
+# =========================
+cd("/")
+dep=create("wls-exporter", "AppDeployment")
+dep.setTargets(jarray.array([cl],TargetMBean))
+dep.setModuleType("war")
+dep.setSourcePath("wlsdeploy/applications/wls-exporter.war")
+
 writeDomain(domain_path)
 closeTemplate()
 
