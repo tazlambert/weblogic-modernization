@@ -13,8 +13,8 @@ build-domain-in-home-image:
   docker: true
   steps:
     - script:
-        name: Install zip curl and docker
-        code: apk --no-cache add zip curl docker
+        name: Install curl and docker
+        code: apk --no-cache add curl docker
     - script:
         name: Build docker image
         code: |
