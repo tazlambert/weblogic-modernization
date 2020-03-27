@@ -1,4 +1,4 @@
-import os
+import os 
 from weblogic.management.configuration import TargetMBean
 
 wl_home                  = os.environ.get("WL_HOME")
