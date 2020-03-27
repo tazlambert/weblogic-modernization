@@ -42,7 +42,7 @@ $ kubectl create secret docker-registry ocirsecret \
   secret "ocirsecret" created
 ```
 
-#### Update Traefik loadbalancer and WebLogic Operator configuration ####
+#### Update WebLogic Operator configuration ####
 
 Once you have your domain namespace (WebLogic domain not yet deployed) you have to update loadbalancer's and operator's configuration about where the domain will be deployed.
 
@@ -59,17 +59,7 @@ helm upgrade \
   sample-weblogic-operator \
   kubernetes/charts/weblogic-operator
 ```
-
-To update Traefik execute the following `helm upgrade` command:
-```
-helm upgrade \
-  --reuse-values \
-  --set "kubernetes.namespaces={traefik,wls-k8s-domain-ns}" \
-  --wait \
-  traefik-operator \
-  stable/traefik
-```
-Please note the only updated parameter in both cases is the domain namespace.
+Please note the only updated parameter in this case is the domain namespace.
 
 #### Deploy WebLogic domain on Kubernetes ####
 
