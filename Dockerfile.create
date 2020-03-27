@@ -4,6 +4,7 @@ FROM store/oracle/weblogic:12.2.1.4-191221
 
 ENV DOMAIN_NAME="wls-k8s-domain"
 ENV DOMAIN_HOME="/u01/oracle/user_projects/domains/${DOMAIN_NAME}"
+ENV MONITORING_EXPORTER_VERSION=1.1.1
 
 USER root
 
@@ -16,6 +17,12 @@ RUN mkdir -p $DOMAIN_HOME && \
 COPY scripts/* ${DOMAIN_HOME}/docker-build-tmp/
 
 COPY target/opdemo.war $DOMAIN_HOME/wlsdeploy/applications/
+
+RUN curl -O -L https://github.com/oracle/weblogic-monitoring-exporter/releases/download/v${MONITORING_EXPORTER_VERSION}/get${MONITORING_EXPORTER_VERSION}.sh && \
+    chmod 777 get${MONITORING_EXPORTER_VERSION}.sh && \
+    bash get${MONITORING_EXPORTER_VERSION}.sh ${DOMAIN_HOME}/docker-build-tmp/exporter-config.yaml
+    
+COPY wls-exporter.war $DOMAIN_HOME/wlsdeploy/applications/
 
 RUN wlst.sh -skipWLSModuleScanning -loadProperties ${DOMAIN_HOME}/docker-build-tmp/datasource.properties \
       ${DOMAIN_HOME}/docker-build-tmp/model.py
