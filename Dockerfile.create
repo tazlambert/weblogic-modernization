@@ -17,16 +17,27 @@ COPY scripts/* ${DOMAIN_HOME}/docker-build-tmp/
 
 COPY target/opdemo.war $DOMAIN_HOME/wlsdeploy/applications/
     
-# Installing weblogic monitoring exporter
+# Installing weblogic monitoring exporter v1.1.1
 
-ENV MONITORING_EXPORTER_VERSION=1.1.1
+RUN yum install zip -y && curl -O -L https://github.com/oracle/weblogic-monitoring-exporter/releases/download/v1.1.1/get1.1.1.sh && \
+    chmod 777 get1.1.1.sh && \
+    bash get1.1.1.sh ${DOMAIN_HOME}/docker-build-tmp/exporter-config.yaml && cp wls-exporter.war $DOMAIN_HOME/wlsdeploy/applications/
 
-RUN yum install zip -y && curl -O -L https://github.com/oracle/weblogic-monitoring-exporter/releases/download/v${MONITORING_EXPORTER_VERSION}/get${MONITORING_EXPORTER_VERSION}.sh && \
-    chmod 777 get${MONITORING_EXPORTER_VERSION}.sh && \
-    bash get${MONITORING_EXPORTER_VERSION}.sh ${DOMAIN_HOME}/docker-build-tmp/exporter-config.yaml && cp wls-exporter.war $DOMAIN_HOME/wlsdeploy/applications/
+# Installing weblogic logging exporter v1.0.0
+
+RUN curl -O -L https://github.com/oracle/weblogic-logging-exporter/releases/download/v1.0.0/weblogic-logging-exporter-1.0.0.jar && \
+    cp weblogic-logging-exporter-1.0.0.jar $DOMAIN_HOME
+    curl -O -L https://search.maven.org/remotecontent?filepath=org/yaml/snakeyaml/1.23/snakeyaml-1.23.jar && \
+    cp snakeyaml-1.23.jar $DOMAIN_HOME
+
+# Create weblogic domain
 
 RUN wlst.sh -skipWLSModuleScanning -loadProperties ${DOMAIN_HOME}/docker-build-tmp/datasource.properties \
       ${DOMAIN_HOME}/docker-build-tmp/model.py
+
+# Edit setDomainEnv.sh to add weblogic logging exporter
+
+RUN echo "export CLASSPATH=\"$DOMAIN_HOME/weblogic-logging-exporter-1.0.0.jar:$DOMAIN_HOME/snakeyaml-1.23.jar:\$CLASSPATH\"" >> ${DOMAIN_HOME}/setDomainEnv.sh
 
 RUN rm -rf ${DOMAIN_HOME}/docker-build-tmp && \
     chown -R oracle:oracle ${DOMAIN_HOME} && \
