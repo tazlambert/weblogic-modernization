@@ -103,6 +103,14 @@ dep.setTargets(jarray.array([cl],TargetMBean))
 dep.setModuleType("war")
 dep.setSourcePath("wlsdeploy/applications/wls-exporter.war")
 
+# Create Startup Class
+# ====================
+cd('/')
+cmo.createStartupClass('weblogic-logging-exporter')
+cd('/StartupClasses/weblogic-logging-exporter')
+cmo.setClassName('weblogic.logging.exporter.Startup')
+set('Targets',jarray.array([ObjectName('com.bea:Name=admin-server,Type=Server'), ObjectName('com.bea:Name=cluster-1,Type=Cluster')], ObjectName))
+
 writeDomain(domain_path)
 closeTemplate()
 
