@@ -1,8 +1,13 @@
 ARG SOURCEIMAGE
 FROM ${SOURCEIMAGE}
+ENV MONITORING_EXPORTER_VERSION=1.1.1
 
 USER root
 COPY target/opdemo.war $DOMAIN_HOME/wlsdeploy/applications/
+
+RUN yum install zip -y && curl -O -L https://github.com/oracle/weblogic-monitoring-exporter/releases/download/v${MONITORING_EXPORTER_VERSION}/get${MONITORING_EXPORTER_VERSION}.sh && \
+    chmod 777 get${MONITORING_EXPORTER_VERSION}.sh && \
+    bash get${MONITORING_EXPORTER_VERSION}.sh ${DOMAIN_HOME}/docker-build-tmp/exporter-config.yaml && cp wls-exporter.war $DOMAIN_HOME/wlsdeploy/applications/
 
 RUN chown -R oracle:oracle $DOMAIN_HOME/wlsdeploy/applications/ && \
     chmod -R a+xwr $DOMAIN_HOME/wlsdeploy/applications/
