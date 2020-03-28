@@ -16,9 +16,6 @@ build-domain-in-home-image:
         name: Install curl and docker
         code: apk --no-cache add curl docker
     - script:
-        name: Install zip
-        code: apk --no-cache add zip
-    - script:
         name: Build docker image
         code: |
               docker login $REGION.ocir.io -u $TENANCY/$OCI_REGISTRY_USERNAME -p $OCI_REGISTRY_PASSWORD
