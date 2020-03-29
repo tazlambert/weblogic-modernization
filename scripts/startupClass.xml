@@ -1,0 +1,5 @@
+  <startup-class>
+    <name>weblogic-logging-exporter</name>
+    <target>admin-server,cluster-1</target>
+    <class-name>weblogic.logging.exporter.Startup</class-name>
+  </startup-class>
