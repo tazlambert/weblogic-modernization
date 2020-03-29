@@ -39,7 +39,7 @@ RUN wlst.sh -skipWLSModuleScanning -loadProperties ${DOMAIN_HOME}/docker-build-t
 # Configuration to add weblogic logging exporter
 
 RUN echo "export CLASSPATH=\"$DOMAIN_HOME/weblogic-logging-exporter-1.0.0.jar:$DOMAIN_HOME/snakeyaml-1.23.jar:\$CLASSPATH\"" >> ${DOMAIN_HOME}/bin/setDomainEnv.sh
-RUN ls -al ${DOMAIN_HOME}/config/ && sed -i '/<admin-server-name>/ r ${DOMAIN_HOME}/docker-build-tmp/startupClass.xml' ${DOMAIN_HOME}/config/config.xml
+RUN ls -al ${DOMAIN_HOME}/config/ && ls -al ${DOMAIN_HOME}/docker-build-tmp && sed -i '/<admin-server-name>/ r ${DOMAIN_HOME}/docker-build-tmp/startupClass.xml' ${DOMAIN_HOME}/config/config.xml
 
 # Cleanup
 
