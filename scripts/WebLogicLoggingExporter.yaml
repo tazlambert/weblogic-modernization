@@ -17,7 +17,7 @@
 weblogicLoggingIndexName: wls
 
 # The host that Elastic Search is running on.  Defaults to localhost.
-publishHost: localhost
+publishHost: elasticsearch.default.svc.cluster.local
 
 # The port that Elastic Search is listening to.   Defaults to 9200.
 publishPort: 9200
