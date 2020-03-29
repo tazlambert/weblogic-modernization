@@ -29,7 +29,7 @@ RUN curl -O -L https://github.com/oracle/weblogic-logging-exporter/releases/down
     cp weblogic-logging-exporter-1.0.0.jar $DOMAIN_HOME && \
     curl -O -L https://search.maven.org/remotecontent?filepath=org/yaml/snakeyaml/1.23/snakeyaml-1.23.jar && \
     cp snakeyaml-1.23.jar $DOMAIN_HOME && \
-    cp ${DOMAIN_HOME}/docker-build-tmp/WebLogicLoggingExporter.yaml ${DOMAIN_HOME}/config
+    cp ${DOMAIN_HOME}/docker-build-tmp/WebLogicLoggingExporter.yaml ${DOMAIN_HOME}/config/
     
 # Create weblogic domain
 
@@ -39,7 +39,7 @@ RUN wlst.sh -skipWLSModuleScanning -loadProperties ${DOMAIN_HOME}/docker-build-t
 # Configuration to add weblogic logging exporter
 
 RUN echo "export CLASSPATH=\"$DOMAIN_HOME/weblogic-logging-exporter-1.0.0.jar:$DOMAIN_HOME/snakeyaml-1.23.jar:\$CLASSPATH\"" >> ${DOMAIN_HOME}/bin/setDomainEnv.sh
-RUN ls -al ${DOMAIN_HOME}/config/ && ls -al ${DOMAIN_HOME}/docker-build-tmp && sed -i '/<admin-server-name>/ r ${DOMAIN_HOME}/docker-build-tmp/startupClass.xml' ${DOMAIN_HOME}/config/config.xml
+RUN sed -i '/<admin-server-name>/ r ${DOMAIN_HOME}/docker-build-tmp/startupClass.xml' ${DOMAIN_HOME}/config/config.xml
 
 # Cleanup
 
