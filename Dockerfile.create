@@ -17,11 +17,11 @@ COPY scripts/* ${DOMAIN_HOME}/docker-build-tmp/
 
 COPY target/opdemo.war $DOMAIN_HOME/wlsdeploy/applications/
     
-# Installing weblogic monitoring exporter v1.1.1
+# Installing weblogic monitoring exporter v1.1.2
 
-RUN yum install zip -y && curl -O -L https://github.com/oracle/weblogic-monitoring-exporter/releases/download/v1.1.1/get1.1.1.sh && \
-    chmod 777 get1.1.1.sh && \
-    bash get1.1.1.sh ${DOMAIN_HOME}/docker-build-tmp/exporter-config.yaml && cp wls-exporter.war $DOMAIN_HOME/wlsdeploy/applications/
+RUN yum install zip -y && curl -O -L https://github.com/oracle/weblogic-monitoring-exporter/releases/download/v1.1.2/get1.1.2.sh && \
+    chmod 777 get1.1.2.sh && \
+    bash get1.1.2.sh ${DOMAIN_HOME}/docker-build-tmp/exporter-config.yaml && cp wls-exporter.war $DOMAIN_HOME/wlsdeploy/applications/
 
 # Installing weblogic logging exporter v1.0.0
 
