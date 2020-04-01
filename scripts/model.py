@@ -14,7 +14,7 @@ cluster_name             = "cluster-1"
 number_of_ms             = 5
 managed_server_name_base = "managed-server"
 managed_server_port      = 8001
-load_balancer_ip         = 129.146.208.161
+load_balancer_ip         = "129.146.208.161"
 load_balancer_http       = 80
 load_balancer_https      = 443
 
