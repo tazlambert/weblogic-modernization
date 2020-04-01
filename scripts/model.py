@@ -14,6 +14,9 @@ cluster_name             = "cluster-1"
 number_of_ms             = 5
 managed_server_name_base = "managed-server"
 managed_server_port      = 8001
+load_balancer_ip         = 129.146.208.161
+load_balancer_http       = 80
+load_balancer_https      = 443
 
 readTemplate(wl_home + "/common/templates/wls/wls.jar")
 
@@ -38,6 +41,9 @@ cl=create(cluster_name, 'Cluster')
 templateName = cluster_name + "-template"
 st=create(templateName, "ServerTemplate")
 st.setListenPort(managed_server_port)
+st.setFrontendHost(load_balancer_ip)
+st.setFrontendHTTPPort(load_balancer_http)
+st.setFrontendHTTPSPort(load_balancer_https)
 st.setCluster(cl)
 cd("/Clusters/" + cluster_name)
 ds=create(cluster_name, "DynamicServers")
