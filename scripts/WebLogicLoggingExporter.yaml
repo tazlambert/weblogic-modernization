@@ -37,7 +37,7 @@ weblogicLoggingExporterEnabled:  true
 # Domain log to log at a lower severity.
 # Possible value includes:  Debug, Info, Notice, Warning, Error, Critical, Alert, Emergency, Off.
 # If this is set to Off,  ALL messages from domain log will be exported.
-weblogicLoggingExporterSeverity:  Notice
+weblogicLoggingExporterSeverity:  Info
 
 # Exports the messages to Elastic Search in bulk mode.
 # When this is not specified, by default, the exporter will not do any batching.  Each messages will be posted to Elastic Search immediately
