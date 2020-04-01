@@ -38,6 +38,9 @@ nap.setListenPort(t3_channel_port)
 
 cd("/")
 cl=create(cluster_name, 'Cluster')
+cl.setFrontendHost(load_balancer_ip)
+cl.setFrontendHTTPPort(load_balancer_http)
+cl.setFrontendHTTPSPort(load_balancer_https)
 templateName = cluster_name + "-template"
 st=create(templateName, "ServerTemplate")
 st.setListenPort(managed_server_port)
