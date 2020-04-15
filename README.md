@@ -5,57 +5,52 @@
 This Hands On Lab is made based on the [WebLogic Kubernetes Operator Documentation](https://oracle.github.io/weblogic-kubernetes-operator/) also various references and has been tested by April 2020.
 
 The Hands On Lab will demonstrates:
-+ **Convert existing WebLogic Domain to docker image** using [Weblogic Deploy Tooling](https://github.com/oracle/weblogic-deploy-tooling) and [WebLogic Image Tool](https://github.com/oracle/weblogic-image-tool)
++ **Move existing WebLogic Domain to docker image** using [Weblogic Deploy Tooling](https://github.com/oracle/weblogic-deploy-tooling) and [WebLogic Image Tool](https://github.com/oracle/weblogic-image-tool)
 + **Improve existing WebLogic Domain** by REST enabling Weblogic metrics for monitoring using [WebLogic Monitoring Exporter](https://github.com/oracle/weblogic-monitoring-exporter) and making WebLogic Log into JSON to be consumed by Elasticsearch using [WebLogic Logging Exporter](https://github.com/oracle/weblogic-logging-exporter) 
 + **Automating WebLogic Domain Lifecycle in CI/CD process**, which will include working with [Oracle Cloud Infrastructure](https://docs.cloud.oracle.com/en-us/iaas/Content/GSG/Concepts/baremetalintro.htm), [Oracle Container Pipelines/Wercker](https://docs.oracle.com/en/cloud/iaas/wercker-cloud/wercm/), [Oracle Container Engine for Kubernetes](https://docs.cloud.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengoverview.htm), [Github](https://github.com/), [Oracle Registry](https://docs.cloud.oracle.com/en-us/iaas/Content/Registry/Concepts/registryoverview.htm), and lastly [WebLogic Kubernetes Operator](https://github.com/oracle/weblogic-kubernetes-operator).
 
 This lab is designed for people with no prior experience with OCI, Kubernetes, WebLogic, WebLogic Tooling, Container Registry, Docker and want to learn the core concepts and basics of how to run WebLogic JEE application on Kubernetes environment.
 
-Oracle services being used during the hands-on are the following:
+### Components ###
 
-+ **Oracle Cloud Infrastructure (OCI)** which combines the elasticity and utility of public cloud with the granular control, security, and predictability of on-premises infrastructure to deliver high-performance, high availability and cost-effective infrastructure services.
-+ **Oracle Container Pipelines (OCP - former Wercker)** is a Docker-Native CI/CD  Automation platform for Kubernetes & Microservice Deployments. OCP is integrated with Docker containers, which package up application code and can be easily moved from server to server. Each build artifact can be a Docker container. The user can take the container from the Docker Hub or his private registry and build the code before shipping it. Its SaaS platform enables developers to test and deploy code often. They can push software updates incrementally as they are ready, rather than in bundled dumps. It makes it easier for coders to practice continuous integration, a software engineering practice in which each change a developer makes to the codebase is constantly tested in the process so that software doesn’t break when it goes live.
-+ **Oracle Cloud Infrastructure Registry (OCIR)** is a v2 container registry hosted on OCI to store and retrieve containers.
-+ **Oracle Container Engine for Kubernetes (OKE)** is an Oracle managed Kubernetes Cluster enviroment to deploy and run container packaged applications.
+By the time this hands on lab created below are the tools that being used and its version:
 
-### The topics to be covered in this tutorial: ###
-
-### Deploy Oracle WebLogic Domain (*Domain-home-in-image*) on Kubernetes using Oracle WebLogic Operator  ###
-
-This lab demonstrates how to deploy and run Weblogic Domain container packaged Web Application on Kubernetes Cluster using [Oracle WebLogic Server Kubernetes Operator 2.4.0](https://github.com/oracle/weblogic-kubernetes-operator).
-
-The demo Web Application is a simple JSP page which shows WebLogic Domain's MBean attributes to demonstrate WebLogic Operator features.
-
-**Architecture**
-
-WebLogic domain can be located either in a persistent volume (PV) or in a Docker image. [There are advantages to both approaches, and there are sometimes technical limitations](https://github.com/oracle/weblogic-kubernetes-operator/blob/2.0/site/domains.md#create-and-manage-weblogic-domains) of various cloud providers that may make one approach better suited to your needs.
-
-This tutorial implements the Docker image with the WebLogic domain inside the image deployment. This means all the artefacts, domain related files are stored within the image. There is no central, shared domain folder from the pods. This is similar to the standard installation topology where you distribute your domain to different host to scale out Managed servers. The main difference is that using container packaged WebLogic Domain you don't need to use pack/unpack mechanism to distribute domain binaries and configuration files between multiple host.
-
-![](tutorials/images/wlsonk8s.domain-home-in-image.png)
-
-In Kubernetes environment WebLogic Operator ensures that only one Admin and multiple Managed servers will run in the domain. An operator is an application-specific controller that extends Kubernetes to create, configure, and manage instances of complex applications. The Oracle WebLogic Server Kubernetes Operator (the "operator") simplifies the management and operation of WebLogic domains and deployments.
-
-Helm is a framework that helps you manage Kubernetes applications, and helm charts help you define and install Helm applications into a Kubernetes cluster. Helm has two parts: a client (Helm) and a server (Tiller). However, in [Helm 3](https://helm.sh/blog/helm-3-released/) Tiller has been removed, latest version still using Tiller is Helm v2.16.2 . Tiller runs inside of your Kubernetes cluster, and manages releases (installations) of your charts.
-
-This tutorial has been tested on Oracle Cloud Infrastructure Container Engine for Kubernetes (OKE).
++ **[Oracle Weblogic Deploy Tooling (WDT) v1.7.3](https://github.com/oracle/weblogic-deploy-tooling/releases/tag/weblogic-deploy-tooling-1.7.3)** 
++ **[Oracle Weblogic Image Tooling (WIT) v1.8.4](https://github.com/oracle/weblogic-image-tool/releases/tag/release-1.8.4)** 
++ **[Oracle Weblogic Monitoring Exporter (WME) v1.1.2](https://github.com/oracle/weblogic-monitoring-exporter/releases/tag/v1.1.2)** 
++ **[Oracle Weblogic Logging Exporter (WLE) v1.0.0](https://github.com/oracle/weblogic-logging-exporter/releases/tag/v1.0.0)** 
++ **[Oracle Weblogic Kubernetes Operator (WKO) v2.5.0](https://github.com/oracle/weblogic-kubernetes-operator/releases/tag/v2.5.0)** 
++ **[Oracle Command Line Interface (OCI) v2.9.11](https://github.com/oracle/oci-cli/releases/tag/v2.9.11)**
++ **[Kubectl v1.18.0](https://github.com/kubernetes/kubectl/releases/tag/kubernetes-1.18.0)**  
++ **[Helm v2.16.6](https://github.com/helm/helm/releases/tag/v2.16.6)** 
++ **[Kubernetes v1.15.7](https://docs.cloud.oracle.com/en-us/iaas/releasenotes/changes/37013251-39b2-4c08-8536-906d76bba789/)** 
++ **[Kube Prometheus v0.3.0](https://github.com/coreos/kube-prometheus/releases/tag/v0.3.0)** 
++ **[Elasticsearch v6.8.0](https://github.com/elastic/elasticsearch/releases/tag/v6.8.0)** 
++ **[Kibana v6.8.0](https://github.com/elastic/kibana/releases/tag/v6.8.0)** 
 
 ### Prerequisites ###
 
-- [Oracle Cloud Infrastructure](https://cloud.oracle.com/en_US/cloud-infrastructure) enabled account. The tutorial has been tested using [Trial account](https://myservices.us.oraclecloud.com/mycloud/signup) (as of January, 2019).
-- Desktop with Oracle Cloud Infrastructure CLI, `kubectl`, `helm`. [Download](https://drive.google.com/open?id=11CvOZ-j50-2q9-rrQmxpEwmQZbPMkw2a) and import the preconfigured VirtualBox image (total required space > 12 GB)
-  - [Download VirtualBox](https://www.virtualbox.org/wiki/Downloads) if necessary.
-- [Docker](https://hub.docker.com/) account.
-- [Github ](sign.up.github.md) account.
-- [Oracle Container Pipeline](sign.up.wercker.md)
++ **[Oracle Cloud Infrastructure](https://cloud.oracle.com/en_US/cloud-infrastructure)** enabled account. The tutorial has been tested using [Trial account](https://myservices.us.oraclecloud.com/mycloud/signup) (as of April, 2020).
++ **Desktop with Oracle Cloud Infrastructure CLI, kubectl, helm.** Preferred to have bastion host in OCI
++ **[Docker](https://hub.docker.com/signup) account.**
++ **[Github](https://github.com/join) account.**
++ **[Oracle Container Pipeline](https://app.wercker.com/users/new?return_url=/) account.**
++ **[Oracle Support](https://support.oracle.com/portal/) account.**
 
-#### Before you start update HOL desktop environment (VirtualBox image) ####
+### Two major topics to be covered in this tutorial: ###
 
-Depending on your network connection make sure you switched ON or OFF the proxy configuration by clicking the corresponding shortcut on the desktop.
+### Moving Existing WebLogic Domain into Docker Image and Improve WebLogic Domain's Monitoring and Logging ###
 
-After the proxy configuration double click the **Update** icon and wait until the update process complete. Hit enter when you see the *Press [Enter] to close the window* message to close the update terminal.
+This will demonstrate the process of moving existing WebLogic domain into docker image using WDT and WIT. The domain will contain demo Web Application which is a simple JSP page which shows WebLogic Domain's MBean attributes. During moving process, improvement process also being done by adding new monitoring and logging capability using WME and WLE. Below is the illustration
 
-![](tutorials/images/update.HOL.png)
+![](tutorials/images/readme1.png)
+
+### Automate WebLogic WebLogic Domain Lifecycle in CI/CD process on Kubernetes  ###
+
+This will demonstrate how to enable CI/CD process on the WebLogic domain, where everytime there is a new code commit in the code repository the whole process of creating image, deploying image will be done automatically, below is the illustrationg
+
+![](tutorials/images/readme2.png)
+
 
 ### The topics to be covered in this hands-on session are: ###
 
