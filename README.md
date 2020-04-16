@@ -2,14 +2,13 @@
 
 ### About this hands-on Hands On Lab ###
 
-This Hands On Lab is made based on the [WebLogic Kubernetes Operator Documentation](https://oracle.github.io/weblogic-kubernetes-operator/) also various references and has been tested by April 2020.
+This Hands On Lab main purpose is to show how to move and improve existing WebLogic Domain so that WebLogic's user will still be able to experience WebLogic adaptation in this agile era. This hands on lab is made based on the [WebLogic Kubernetes Operator Documentation](https://oracle.github.io/weblogic-kubernetes-operator/) also various references and has been tested by April 2020.
 
 The Hands On Lab will demonstrates:
-+ **Move existing WebLogic Domain to docker image** using [Weblogic Deploy Tooling](https://github.com/oracle/weblogic-deploy-tooling) and [WebLogic Image Tool](https://github.com/oracle/weblogic-image-tool)
-+ **Improve existing WebLogic Domain** by REST enabling Weblogic metrics for monitoring using [WebLogic Monitoring Exporter](https://github.com/oracle/weblogic-monitoring-exporter) and making WebLogic Log into JSON to be consumed by Elasticsearch using [WebLogic Logging Exporter](https://github.com/oracle/weblogic-logging-exporter) 
++ **Move and improve existing WebLogic Domain** using [Weblogic Deploy Tooling](https://github.com/oracle/weblogic-deploy-tooling) and [WebLogic Image Tool](https://github.com/oracle/weblogic-image-tool). WebLogic improve is done by REST enabling Weblogic metrics for monitoring using [WebLogic Monitoring Exporter](https://github.com/oracle/weblogic-monitoring-exporter) and making WebLogic Log into JSON to be consumed by Elasticsearch using [WebLogic Logging Exporter](https://github.com/oracle/weblogic-logging-exporter) 
 + **Automating WebLogic Domain Lifecycle in CI/CD process**, which will include working with [Oracle Cloud Infrastructure](https://docs.cloud.oracle.com/en-us/iaas/Content/GSG/Concepts/baremetalintro.htm), [Oracle Container Pipelines/Wercker](https://docs.oracle.com/en/cloud/iaas/wercker-cloud/wercm/), [Oracle Container Engine for Kubernetes](https://docs.cloud.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengoverview.htm), [Github](https://github.com/), [Oracle Registry](https://docs.cloud.oracle.com/en-us/iaas/Content/Registry/Concepts/registryoverview.htm), and lastly [WebLogic Kubernetes Operator](https://github.com/oracle/weblogic-kubernetes-operator).
 
-This lab is designed for people with no prior experience with OCI, Kubernetes, WebLogic, WebLogic Tooling, Container Registry, Docker and want to learn the core concepts and basics of how to run WebLogic JEE application on Kubernetes environment.
+This lab is designed for people with no some experience with OCI, Kubernetes, WebLogic, and no experience with WebLogic Tooling, Container Registry, Docker and want to learn the core concepts and basics of how to run WebLogic JEE application on Kubernetes environment.
 
 ### Components ###
 
@@ -52,18 +51,15 @@ This will demonstrate how to enable CI/CD process on the WebLogic domain, where 
 ![](tutorials/images/readme2.png)
 
 
-### The topics to be covered in this hands-on session are: ###
+### References ###
 
-0. [Setup Oracle Kubernetes Engine instance on Oracle Cloud Infrastructure.](tutorials/setup.oke.md)
-1. [Create Oracle Container Pipelines Application to Build Custom WebLogic Domain Image](tutorials/build.weblogic.image.pipeline.md)
-2. [Install WebLogic Operator](tutorials/install.operator.md)
-3. [Deploy WebLogic Domain](tutorials/deploy.weblogic.md)
-4. [Deploy Ingress Load Balancer](tutorials/deploy.load.balancer.md)
-5. [Scaling WebLogic Cluster](tutorials/scale.weblogic.md)
-6. [Override JDBC Datasource parameters](tutorials/override.jdbc.md)
-7. [Update Web Application](tutorials/update.application.md)
-8. [Assigning WebLogic Pods to Nodes](tutorials/node.selector.md)
-9. [Assigning WebLogic Pods to Licensed Nodes](tutorials/node.selector.license.md)
+1. [Automating WebLogic Deployment - CI/CD with WebLogic Tooling](https://blogs.oracle.com/weblogicserver/automating-weblogic-deployment-cicd-with-weblogic-tooling)
+2. [Oracle WebLogic Server Kubernetes Operator Documentation](https://oracle.github.io/weblogic-kubernetes-operator/)
+3. [Oracle WebLogic Server Deploy Tooling](https://github.com/oracle/weblogic-deploy-tooling/blob/master/README.md)
+4. [Oracle WebLogic Image Tool](https://github.com/oracle/weblogic-image-tool/blob/master/README.md)
+5. [Oracle WebLogic Monitoring Exporter](https://github.com/oracle/weblogic-monitoring-exporter/blob/master/README.md)
+6. [Oracle WebLogic Logging Exporter](https://github.com/oracle/weblogic-logging-exporter/blob/master/README.md)
+7. [Oracle Weblogic Server Kubernetes Operator Samples](https://github.com/oracle/weblogic-kubernetes-operator/tree/master/kubernetes/samples)
 
 ### License ###
 Copyright (c) 2020 Oracle and/or its affiliates
