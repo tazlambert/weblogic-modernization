@@ -1,4 +1,4 @@
-# Create Existing WebLogic domaina artifact using Oracle WebLogic Deploy Tooling #
+# Create Existing WebLogic domain artifact using Oracle WebLogic Deploy Tooling #
 
 For this Hands on Lab we assume that there is existing WebLogic Domain that already running, with 1 demo Web Application deployment and 1 datasource. The WebLogic version that currently being used 12.2.1.4 and Oracle JDK 1.8.0_231 on Oracle Enterprise Linux 7.7 Slim version. From this domain we will create a docker image that will be stored inside OCIR and later can be deployed into OKE and it will be done using Oracle WebLogic Deploy Tooling.
 
