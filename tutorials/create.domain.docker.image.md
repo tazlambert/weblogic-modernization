@@ -61,7 +61,7 @@ Login Succeeded
 
 #### Prepare Docker in bastion ####
 
-Most of the time, there is no out of the box docker capability, so we need to enable docker engine in the OS, otherwise we cannot login to OCIR repository. To do that you need to ahve sudo or root privileges, and do the followinf:
+Most of the time, there is no out of the box docker capability, so we need to enable docker engine in the OS, otherwise we cannot login to OCIR repository. To do that you need to have sudo or root privileges, and do the following:
 ```
 yum install -y yum-utils zip unzip
 yum-config-manager --enable ol7_optional_latest
@@ -69,7 +69,7 @@ yum-config-manager --enable ol7_addons
 yum install -y oraclelinux-developer-release-el7
 yum-config-manager --enable ol7_developer
 yum install -y docker-engine
-sudo systemctl enable docker
-sudo chkconfig docker on
+systemctl enable docker
+chkconfig docker on
 ```
-Above command will enable docker engine capability in bastion and auto start docker engine after reboot. Beside this, you need to check also the firewall and SELinux in the bastion OS, make sure it open the required ports.
+Above commands will enable docker engine capability in bastion and auto start docker engine after reboot. Beside this, you need to check also the firewall and SELinux in the bastion OS, make sure it open the required ports.
