@@ -33,11 +33,10 @@ Go to the extracted directory and go to bin folder and execute discover domain c
 | domain_home | /u01/oracle/user_projects/domains/wls-k8s-domain/ | The path location where existing WebLogic Domain was installed |
 | [archive_file](https://github.com/oracle/weblogic-deploy-tooling/blob/master/site/archive.md) | wls-k8s-domain.zip | The archive to deploy binaries and other file resources to the target domain  |
 | [model_file](https://github.com/oracle/weblogic-deploy-tooling#the-metadata-model) | wls-k8s-domain.yaml | The file to describe the domain and applications |
-| variable_file | wls-k8s-domain.properties | The file to store credential from the domain variable in the model_file |
 ```
-./discoverDomain.sh -oracle_home /u01/oracle/ -domain_home /u01/oracle/user_projects/domains/wls-k8s-domain/ -archive_file wls-k8s-domain.zip -model_file wls-k8s-domain.yaml -variable_file wls-k8s-domain.properties 
+./discoverDomain.sh -oracle_home /u01/oracle/ -domain_home /u01/oracle/user_projects/domains/wls-k8s-domain/ -archive_file wls-k8s-domain.zip -model_file wls-k8s-domain.yaml 
 ```
 ![alt text](images/wdt/wdt4.png)
 ![alt text](images/wdt/wdt5.png)
 
-Once the process is done, make sure there is no error and copy the artifact (wls-k8s-domain.zip, wls-k8s-domain.yaml, wls-k8s-domain.properties)
+Once the process is done, make sure there is no error and copy the artifact (wls-k8s-domain.zip, wls-k8s-domain.yaml)
