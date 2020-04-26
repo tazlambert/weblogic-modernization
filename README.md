@@ -43,6 +43,7 @@ By the time this hands on lab created below are the tools that being used and it
 This will demonstrate the process of moving existing WebLogic domain into docker image using WDT and WIT. The domain will contain demo Web Application which is a simple JSP page which shows WebLogic Domain's MBean attributes. During moving process, improvement process also being done by adding new monitoring and logging capability using WME and WLE. Below is the illustration
 
 1. [Create Existing WebLogic domain artifact using Oracle WebLogic Deploy Tooling](tutorials/create.domain.artifact.md)
+2. [Create Existing WebLogic domain Docker image using Oracle WebLogic Image Tool](tutorials/create.domain.docker.image.md)
 
 ![](tutorials/images/readme1.png)
 
