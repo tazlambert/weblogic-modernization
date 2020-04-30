@@ -210,6 +210,7 @@ appDeployments:
 | NodeManagerPasswordEncrypted | remove this parameter | Not needed so it will be removed |
 | CredentialEncrypted | remove this parameter | Not needed so it will be removed  |
 | PasswordEncrypted | welcome1 | datasource user password |
+
 Which will make the mode file like below:
 ```
 domainInfo:
