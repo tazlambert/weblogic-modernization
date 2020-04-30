@@ -211,7 +211,7 @@ appDeployments:
 | CredentialEncrypted | remove this parameter | Not needed so it will be removed  |
 | PasswordEncrypted | welcome1 | datasource user password |
 
-Which will make the mode file like below:
+Which will make the model file like below:
 ```
 domainInfo:
     AdminUserName: 'weblogic'
