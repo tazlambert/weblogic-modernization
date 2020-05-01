@@ -1,6 +1,6 @@
 domainInfo:
-    AdminUserName: '@@PROP:AdminUserName@@'
-    AdminPassword: '@@PROP:AdminPassword@@'
+    AdminUserName: 'weblogic'
+    AdminPassword: 'welcome1'
 topology:
     Name: 'wls-k8s-domain'
     AdminServerName: 'admin-server'
@@ -10,9 +10,6 @@ topology:
         weblogic.StartScriptName: startWebLogic.sh
     Cluster:
         'cluster-1':
-            FrontendHost: 129.146.208.161
-            FrontendHTTPPort: 80
-            FrontendHTTPSPort: 443
             DynamicServers:
                 ServerNamePrefix: 'managed-server'
                 MaxDynamicClusterSize: 5
@@ -33,8 +30,6 @@ topology:
             SSL:
                 ListenPort: 8100
     SecurityConfiguration:
-        NodeManagerPasswordEncrypted: '@@PROP:SecurityConfig.NodeManagerPasswordEncrypted@@'
-        CredentialEncrypted: '@@PROP:SecurityConfig.CredentialEncrypted@@'
         Realm:
             myrealm:
                 Adjudicator:
@@ -74,7 +69,7 @@ resources:
                     JNDIName: jdbc/testDatasource
                 JDBCDriverParams:
                     URL: 'jdbc:oracle:thin:@//xxx.xxx.x.xxx:1521/ORCLCDB'
-                    PasswordEncrypted: '@@PROP:JDBC.testDatasource.PasswordEncrypted@@'
+                    PasswordEncrypted: 'welcome1'
                     DriverName: oracle.jdbc.OracleDriver
                     Properties:
                         user:
