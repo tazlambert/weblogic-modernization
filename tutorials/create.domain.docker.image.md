@@ -1,6 +1,6 @@
-# Create Existing WebLogic domain Docker image using Oracle WebLogic Image Tool #
+# Create Docker image from existing WebLogic domain #
 
-For the continuation of this Hands on Lab we are going to use the existing WebLogic Domain artifact that was created, an archive and model from WDT script. In this part we will create a docker image that will be added with WebLogic Monitoring Exporter and WebLogic Logging Exporter, also the process will add latest patch then finally will be stored inside OCIR as init image.
+For the continuation of this Hands on Lab we are going to use the existing WebLogic Domain artifact that was created, an archive and model from WDT script. In this part we will create a docker image using WebLogic Image Tool, also the process will add latest patch then finally will be stored inside OCIR as init image.
 
 ![alt text](images/wit/wit_only.png)
 
