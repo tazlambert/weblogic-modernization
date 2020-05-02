@@ -1,6 +1,6 @@
 # Welcome to Oracle WebLogic Move and Improve Hands On Lab #
 
-### About this hands-on Hands On Lab ###
+## About this hands-on Hands On Lab ##
 
 This Hands On Lab main purpose is to show how to move and improve existing WebLogic Domain so that WebLogic's user will still be able to experience WebLogic adaptation in this agile era. This hands on lab is made based on the [WebLogic Kubernetes Operator Documentation](https://oracle.github.io/weblogic-kubernetes-operator/) also various references and has been tested by April 2020.
 
@@ -10,17 +10,17 @@ The Hands On Lab will demonstrates:
 
 This lab is designed for people with no some experience with OCI, Kubernetes, WebLogic, and no experience with WebLogic Tooling, Container Registry, Docker and want to learn the core concepts and basics of how to run WebLogic JEE application on Kubernetes environment.
 
-### Components ###
+## Components ##
 
 By the time this hands on lab created below are the tools that being used and its version:
 
-## WebLogic Tooling ##
+### WebLogic Tooling ###
 + **[Oracle Weblogic Deploy Tooling (WDT) v1.7.3](https://github.com/oracle/weblogic-deploy-tooling/releases/tag/weblogic-deploy-tooling-1.7.3)** 
 + **[Oracle Weblogic Image Tooling (WIT) v1.8.4](https://github.com/oracle/weblogic-image-tool/releases/tag/release-1.8.4)** 
 + **[Oracle Weblogic Monitoring Exporter (WME) v1.1.2](https://github.com/oracle/weblogic-monitoring-exporter/releases/tag/v1.1.2)** 
 + **[Oracle Weblogic Logging Exporter (WLE) v1.0.0](https://github.com/oracle/weblogic-logging-exporter/releases/tag/v1.0.0)** 
 + **[Oracle Weblogic Kubernetes Operator (WKO) v2.5.0](https://github.com/oracle/weblogic-kubernetes-operator/releases/tag/v2.5.0)** 
-## Others Tooling ##
+### Others Tooling ###
 + **[Oracle Command Line Interface (OCI) v2.9.11](https://github.com/oracle/oci-cli/releases/tag/v2.9.11)**
 + **[Kubectl v1.18.0](https://github.com/kubernetes/kubectl/releases/tag/kubernetes-1.18.0)**  
 + **[Helm v2.16.6](https://github.com/helm/helm/releases/tag/v2.16.6)** 
@@ -29,7 +29,7 @@ By the time this hands on lab created below are the tools that being used and it
 + **[Elasticsearch v6.8.0](https://github.com/elastic/elasticsearch/releases/tag/v6.8.0)** 
 + **[Kibana v6.8.0](https://github.com/elastic/kibana/releases/tag/v6.8.0)** 
 
-### Prerequisites ###
+## Prerequisites ##
 
 + **[Oracle Cloud Infrastructure](https://cloud.oracle.com/en_US/cloud-infrastructure)** enabled account. The tutorial has been tested using [Trial account](https://myservices.us.oraclecloud.com/mycloud/signup) (as of April, 2020).
 + **Desktop with Oracle Cloud Infrastructure CLI, kubectl, helm.** Preferred to have bastion host in OCI
@@ -38,7 +38,7 @@ By the time this hands on lab created below are the tools that being used and it
 + **[Oracle Container Pipeline](https://app.wercker.com/users/new?return_url=/) account.**
 + **[Oracle Support](https://support.oracle.com/portal/) account.**
 
-### Two major topics to be covered in this tutorial: ###
+## Two major topics to be covered in this tutorial: ##
 
 ### Moving Existing WebLogic Domain into Docker Image and Improve WebLogic Domain's Monitoring and Logging ###
 
@@ -58,7 +58,7 @@ This will demonstrate how to enable CI/CD process on the WebLogic domain, where 
 ![](tutorials/images/readme2.png)
 
 
-### References ###
+## References ##
 
 1. [Automating WebLogic Deployment - CI/CD with WebLogic Tooling](https://blogs.oracle.com/weblogicserver/automating-weblogic-deployment-cicd-with-weblogic-tooling)
 2. [Oracle WebLogic Server Kubernetes Operator Documentation](https://oracle.github.io/weblogic-kubernetes-operator/)
@@ -68,6 +68,6 @@ This will demonstrate how to enable CI/CD process on the WebLogic domain, where 
 6. [Oracle WebLogic Logging Exporter](https://github.com/oracle/weblogic-logging-exporter/blob/master/README.md)
 7. [Oracle Weblogic Server Kubernetes Operator Samples](https://github.com/oracle/weblogic-kubernetes-operator/tree/master/kubernetes/samples)
 
-### License ###
+## License ##
 Copyright (c) 2020 Oracle and/or its affiliates
 The Universal Permissive License (UPL), Version 1.0
