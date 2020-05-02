@@ -6,17 +6,43 @@ Oracle is finding ways for organizations using WebLogic Server to run important 
 
 ## Install and configure Operator  ##
 
-An operator is an application-specific controller that extends Kubernetes to create, configure, and manage instances of complex applications. The Oracle WebLogic Server Kubernetes Operator (the "operator") simplifies the management and operation of WebLogic domains and deployments.
-
-#### Install the Operator operator with a Helm chart ####
-
----
-Note! If you don't use the prepared VirtualBox desktop environment first clone the WebLogic Operator git repository to your desktop.
+An operator is an application-specific controller that extends Kubernetes to create, configure, and manage instances of complex applications. The Oracle WebLogic Server Kubernetes Operator (the "operator") simplifies the management and operation of WebLogic domains and deployments. Before we start, we need to clone the WebLogic Operator git repository into the bastion PC.
 ```
 sudo yum install git -y
+cd
 git clone https://github.com/oracle/weblogic-kubernetes-operator.git  -b release/2.5.0
 ```
----
+
+### Install the Elasticsearch and Kibana  ###
+
+When you install the WebLogic Kubernetes Operator Helm chart, you can set elkIntegrationEnabled to true in your values.yaml file to tell the operator to send the contents of the operator’s logs to Elasticsearch. Typically, you would have already configured Elasticsearch and Kibana in the Kubernetes cluster, and also would have specified elasticSearchHost and elasticSearchPort in your values.yaml file to point to where Elasticsearch is already running.
+```
+cd weblogic-kubernetes-operator/kubernetes/samples/scripts/elasticsearch-and-kibana/
+kubectl apply -f elasticsearch_and_kibana.yaml
+```
+The scripts will create several items like below:
+```
+deployment.apps/elasticsearch created
+service/elasticsearch created
+deployment.apps/kibana created
+service/kibana created
+```
+The service that is created a elasticsearch that accessible within the Kubernetes only, and a kibana service that accessible from anywhere through Kubernetes Node, where port 5601 already mapped to other port.
+```
+[opc@bastion1 elasticsearch-and-kibana]$ kubectl get pods -o wide
+NAME                             READY   STATUS    RESTARTS   AGE     IP           NODE        NOMINATED NODE   READINESS GATES
+elasticsearch-6858c54456-m2gxm   1/1     Running   0          4m23s   10.244.2.6   10.0.10.4   <none>           <none>
+kibana-6d74455686-jc29k          1/1     Running   0          4m23s   10.244.0.6   10.0.10.2   <none>           <none>
+[opc@bastion1 elasticsearch-and-kibana]$ kubectl get services
+NAME            TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)             AGE
+elasticsearch   ClusterIP   10.96.236.194   <none>        9200/TCP,9300/TCP   4m46s
+kibana          NodePort    10.96.178.103   <none>        5601:32172/TCP      4m46s
+kubernetes      ClusterIP   10.96.0.1       <none>        443/TCP             6d
+```
+From above results kibana can be accessed from 10.0.10.2:32172.
+
+### Install the Operator with a Helm chart ###
+
 Before using helm install it using script https://helm.sh/docs/intro/install/ make sure to choose appropriate version, by sepcifying it in the command 
 ```
 curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
