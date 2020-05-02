@@ -6,7 +6,7 @@ After having the existing WebLogic domain moved into Docker image, next step is 
 - Elasticsearch and Kibana for logging purpose using WebLogic Logging Exporter
 - Preparing Oracle Kubernetes Engine for WebLogic using WebLogic Kubernetes Operator
 
-
+![](tutorials/images/wit/wit.png)
 
 ### Install and configure Operator  ###
 
