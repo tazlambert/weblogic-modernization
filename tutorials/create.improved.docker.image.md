@@ -1,18 +1,6 @@
 # Setup WebLogic Kubernetes Operator to orchestrate WebLogic in Kubernetes #
 
-Oracle is finding ways for organizations using WebLogic Server to run important workloads, to move those workloads into the cloud. By certifying on industry standards, such as Docker and Kubernetes, WebLogic now runs in a cloud neutral infrastructure. In addition, we've provided an open-source Oracle WebLogic Server Kubernetes Operator (the “operator”) which has several key features to assist you with deploying and managing WebLogic domains in a Kubernetes environment. You can:
-
-* Create WebLogic domains in a Kubernetes persistent volume. This persistent volume can reside in an NFS file system or other Kubernetes volume types.
-* Create a WebLogic domain in a Docker image.
-* Override certain aspects of the WebLogic domain configuration.
-* Define WebLogic domains as a Kubernetes resource (using a Kubernetes custom resource definition).
-* Start servers based on declarative startup parameters and desired states.
-* Manage WebLogic configured or dynamic clusters.
-* Expose the WebLogic Server Administration Console outside the Kubernetes cluster, if desired.
-* Expose T3 channels outside the Kubernetes domain, if desired.
-* Expose HTTP paths on a WebLogic domain outside the Kubernetes domain with load balancing and update the load balancer when Managed Servers in the WebLogic domain are started or stopped.
-* Scale WebLogic domains by starting and stopping Managed Servers on demand, or by integrating with a REST API to initiate scaling based on WLDF, Prometheus, Grafana, or other rules.
-* Publish operator and WebLogic Server logs into Elasticsearch and interact with them in Kibana.
+Oracle is finding ways for organizations using WebLogic Server to run important workloads, to move those workloads into the cloud. By certifying on industry standards, such as Docker and Kubernetes, WebLogic now runs in a cloud neutral infrastructure. In addition, we've provided an open-source Oracle WebLogic Server Kubernetes Operator (the “operator”) which has several key features to assist you with deploying and managing WebLogic domains in a Kubernetes environment. 
 
 ![](images/wko/wko.png)
 
