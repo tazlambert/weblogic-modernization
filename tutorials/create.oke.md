@@ -1,6 +1,6 @@
-# Create Oracle Container Engine for Kubernetes (OKE) on Oracle Cloud Infrastructure (OCI) #
+# Create Oracle Kubernetes Engine to orchestrate the Docker image #
 
-Oracle Cloud Infrastructure Container Engine for Kubernetes is a fully-managed, scalable, and highly available service that you can use to deploy your containerised applications to the cloud. Use Container Engine for Kubernetes (sometimes abbreviated to just OKE) when your development team wants to reliably build, deploy, and manage cloud-native applications. You specify the compute resources that your applications require, and Container Engine for Kubernetes provisions them on Oracle Cloud Infrastructure in an existing OCI tenancy.
+Oracle Kubernetes Engine is a fully-managed, scalable, and highly available service that you can use to deploy your containerised applications to the cloud, in this case existing WebLogic domain. Beside that OKE used when your development team wants to reliably build, deploy, and manage cloud-native applications. You specify the compute resources that your applications require, and Container Engine for Kubernetes provisions them on Oracle Cloud Infrastructure in an existing OCI tenancy automatically.
 
 ### Prerequisites ###
 
