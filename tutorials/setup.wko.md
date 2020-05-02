@@ -90,7 +90,8 @@ Create the service account:
 
 Make sure before execute operator `helm` install you are in the WebLogic Operator's local Git repository folder.
 
-    cd /u01/content/weblogic-kubernetes-operator/
+    cd
+    cd weblogic-kubernetes-operator/
 
 Use the `helm install` command to install the operator Helm chart. As part of this, you must specify a "release" name for their operator.
 
@@ -192,4 +193,14 @@ NAME                            REVISION        UPDATED                         
 sample-weblogic-operator        1               Sat May  2 10:44:22 2020        DEPLOYED        weblogic-operator-2.5.0                 sample-weblogic-operator-ns
 ```
 
-The WebLogic Operator has been installed. You can continue with next tutorial module.
+The WebLogic Operator has been installed. You can also check if the log of WebLogic Operator already sent to elasticsearch and kibana, by accessing the kibana dashboard, click discover menu and create index pattern to process log from WebLogic Operator, but typing logstash and click Next Step:
+![](images/wko/wko_kibana1.png)
+
+Next is to pick timestamp value, in this case @timestamp form the drop list, then click Create Index Pattern.
+![](images/wko/wko_kibana2.png)
+
+The result of the log index configuration is like below:
+![](images/wko/wko_kibana3.png)
+
+To check if the log from WebLogic Operator can be seen from kibana or not, click discover and the result suppose to be like below:
+![](images/wko/wko_kibana4.png)
