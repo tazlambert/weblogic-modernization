@@ -14,7 +14,7 @@ This lab is designed for people with no some experience with OCI, Kubernetes, We
 
 By the time this hands on lab created below are the tools that being used and its version:
 
-+ **[Oracle Weblogic Deploy Tooling (WDT) v1.7.3](https://github.com/oracle/weblogic-deploy-tooling/releases/tag/weblogic-deploy-tooling-1.7.3)** 
+++ **[Oracle Weblogic Deploy Tooling (WDT) v1.7.3](https://github.com/oracle/weblogic-deploy-tooling/releases/tag/weblogic-deploy-tooling-1.7.3)** 
 + **[Oracle Weblogic Image Tooling (WIT) v1.8.4](https://github.com/oracle/weblogic-image-tool/releases/tag/release-1.8.4)** 
 + **[Oracle Weblogic Monitoring Exporter (WME) v1.1.2](https://github.com/oracle/weblogic-monitoring-exporter/releases/tag/v1.1.2)** 
 + **[Oracle Weblogic Logging Exporter (WLE) v1.0.0](https://github.com/oracle/weblogic-logging-exporter/releases/tag/v1.0.0)** 
