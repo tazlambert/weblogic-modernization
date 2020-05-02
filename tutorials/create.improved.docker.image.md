@@ -1,15 +1,22 @@
-# Create improved existing WebLogic domain Docker image for Monitoring and Logging #
+# Setup WebLogic Kubernetes Operator to orchestrate WebLogic in Kubernetes #
 
-After having the existing WebLogic domain moved into Docker image, next step is to improved the image by adding capability to integrate with:
+Oracle is finding ways for organizations using WebLogic Server to run important workloads, to move those workloads into the cloud. By certifying on industry standards, such as Docker and Kubernetes, WebLogic now runs in a cloud neutral infrastructure. In addition, we've provided an open-source Oracle WebLogic Server Kubernetes Operator (the “operator”) which has several key features to assist you with deploying and managing WebLogic domains in a Kubernetes environment. You can:
 
-- Prometheus and Grafana for monitoring purpose using WebLogic Monitoring Exporter
-- Elasticsearch and Kibana for logging purpose using WebLogic Logging Exporter
-- Preparing Oracle Kubernetes Engine for WebLogic using WebLogic Kubernetes Operator
+* Create WebLogic domains in a Kubernetes persistent volume. This persistent volume can reside in an NFS file system or other Kubernetes volume types.
+* Create a WebLogic domain in a Docker image.
+* Override certain aspects of the WebLogic domain configuration.
+* Define WebLogic domains as a Kubernetes resource (using a Kubernetes custom resource definition).
+* Start servers based on declarative startup parameters and desired states.
+* Manage WebLogic configured or dynamic clusters.
+* Expose the WebLogic Server Administration Console outside the Kubernetes cluster, if desired.
+* Expose T3 channels outside the Kubernetes domain, if desired.
+* Expose HTTP paths on a WebLogic domain outside the Kubernetes domain with load balancing and update the load balancer when Managed Servers in the WebLogic domain are started or stopped.
+* Scale WebLogic domains by starting and stopping Managed Servers on demand, or by integrating with a REST API to initiate scaling based on WLDF, Prometheus, Grafana, or other rules.
+* Publish operator and WebLogic Server logs into Elasticsearch and interact with them in Kibana.
 
-Which will make the Docker image like this:
-![](images/wit/wit.png)
+![](images/wko/wko.png)
 
-### Install and configure Operator  ###
+## Install and configure Operator  ##
 
 An operator is an application-specific controller that extends Kubernetes to create, configure, and manage instances of complex applications. The Oracle WebLogic Server Kubernetes Operator (the "operator") simplifies the management and operation of WebLogic domains and deployments.
 
@@ -94,7 +101,7 @@ Execute the following `helm install`:
 helm install kubernetes/charts/weblogic-operator \
   --name sample-weblogic-operator \
   --namespace sample-weblogic-operator-ns \
-  --set image=oracle/weblogic-kubernetes-operator:2.4.0 \
+  --set image=oracle/weblogic-kubernetes-operator:2.5.0 \
   --set serviceAccount=sample-weblogic-operator-sa \
   --set "domainNamespaces={}"
 ```
