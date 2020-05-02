@@ -1,4 +1,12 @@
-# Oracle WebLogic Operator Tutorial #
+# Create improved existing WebLogic domain Docker image for Monitoring and Logging #
+
+After having the existing WebLogic domain moved into Docker image, next step is to improved the image by adding capability to integrate with:
+
+- Prometheus and Grafana for monitoring purpose using WebLogic Monitoring Exporter
+- Elasticsearch and Kibana for logging purpose using WebLogic Logging Exporter
+- Preparing Oracle Kubernetes Engine for WebLogic using WebLogic Kubernetes Operator
+
+
 
 ### Install and configure Operator  ###
 
