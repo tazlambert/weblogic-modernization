@@ -7,7 +7,7 @@ After having the existing WebLogic domain moved into Docker image, next step is 
 - Preparing Oracle Kubernetes Engine for WebLogic using WebLogic Kubernetes Operator
 
 Which will make the Docker image like this:
-![](tutorials/images/wit/wit.png)
+![](images/wit/wit.png)
 
 ### Install and configure Operator  ###
 
