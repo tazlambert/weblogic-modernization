@@ -47,7 +47,7 @@ Before using helm install it using script https://helm.sh/docs/intro/install/ ma
 ```
 curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
 chmod 755 get_helm.sh
-./get_helm.sh --version v2.16.2
+./get_helm.sh --version v2.16.6
 sudo ln -s /usr/local/bin/helm /usr/bin/helm
 helm init
 helm repo add weblogic-operator https://oracle.github.io/weblogic-kubernetes-operator/charts
@@ -74,7 +74,6 @@ subjects:
   namespace: kube-system
 EOF
 ```
-
 The output has to be the following:
 
     clusterrolebinding "helm-user-cluster-admin-role" created
@@ -97,66 +96,74 @@ Use the `helm install` command to install the operator Helm chart. As part of th
 
 You can override default configuration values in the operator Helm chart by doing one of the following:
 
-- Creating a [custom YAML](https://github.com/oracle/weblogic-kubernetes-operator/blob/2.0/kubernetes/charts/weblogic-operator/values.yaml) file containing the values to be overridden, and specifying the `--value` option on the Helm command line.
 - Overriding individual values directly on the Helm command line, using the `--set` option.
-
-Using the last option simply define overriding values using the `--set` option.
+- Creating a custom YAML from the [template YAML](https://github.com/oracle/weblogic-kubernetes-operator/blob/master/kubernetes/charts/weblogic-operator/values.yaml) file containing the values to be overridden, and specifying the `--value` option on the Helm command line.
+```
+serviceAccount: "sample-weblogic-operator-sa"
+dedicated: false
+domainNamespaces:
+  - "default"
+image: "oracle/weblogic-kubernetes-operator:2.5.0"
+imagePullPolicy: "IfNotPresent"
+externalRestEnabled: false
+externalRestHttpsPort: 31001
+remoteDebugNodePortEnabled: false
+suspendOnDebugStartup: false
+internalDebugHttpPort: 30999
+externalDebugHttpPort: 30999
+javaLoggingLevel: "INFO"
+elkIntegrationEnabled: true
+logStashImage: "logstash:6.6.0"
+elasticSearchHost: "elasticsearch.default.svc.cluster.local"
+elasticSearchPort: 9200
+istioEnabled: false
+```
+For this lab we are going to use custom Value from above and save it as wkoValues.yaml and save it inside weblogic-kubernetes-operator directory.
 
 Note the values:
 
 - **name**: name of the resource
 - **namespace**: where the operator deployed
-- **image**: the prebuilt WebLogic Operator 2.0 image. Available on public Docker hub.
-- **serviceAccount**: service account required to run operator
-- **domainNamespaces**: namespaces where WebLogic domains deployed in order to control. Note WebLogic domain is not yet deployed so this value will be updated when namespaces created for WebLogic deployment.
+- **values**: custom values for WebLogic Operator parameter, especially connecting it to elasticsearch.
 
 Execute the following `helm install`:
 ```
-helm install kubernetes/charts/weblogic-operator \
-  --name sample-weblogic-operator \
-  --namespace sample-weblogic-operator-ns \
-  --set image=oracle/weblogic-kubernetes-operator:2.5.0 \
-  --set serviceAccount=sample-weblogic-operator-sa \
-  --set "domainNamespaces={}"
+helm install kubernetes/charts/weblogic-operator --name sample-weblogic-operator --namespace sample-weblogic-operator-ns --values=wkoValues.yaml
 ```
 The result has to be similar:
 ```
 NAME:   sample-weblogic-operator
-LAST DEPLOYED: Tue Mar  3 07:37:47 2020
+LAST DEPLOYED: Sat May  2 10:44:22 2020
 NAMESPACE: sample-weblogic-operator-ns
 STATUS: DEPLOYED
 
 RESOURCES:
 ==> v1/ClusterRole
 NAME                                                                      AGE
-sample-weblogic-operator-ns-weblogic-operator-clusterrole-domain-admin    1s
-sample-weblogic-operator-ns-weblogic-operator-clusterrole-general         1s
-sample-weblogic-operator-ns-weblogic-operator-clusterrole-namespace       1s
-sample-weblogic-operator-ns-weblogic-operator-clusterrole-nonresource     1s
-sample-weblogic-operator-ns-weblogic-operator-clusterrole-operator-admin  1s
+sample-weblogic-operator-ns-weblogic-operator-clusterrole-domain-admin    0s
+sample-weblogic-operator-ns-weblogic-operator-clusterrole-general         0s
+sample-weblogic-operator-ns-weblogic-operator-clusterrole-namespace       0s
+sample-weblogic-operator-ns-weblogic-operator-clusterrole-nonresource     0s
+sample-weblogic-operator-ns-weblogic-operator-clusterrole-operator-admin  0s
 
 ==> v1/ClusterRoleBinding
 NAME                                                                             AGE
-sample-weblogic-operator-ns-weblogic-operator-clusterrolebinding-auth-delegator  1s
-sample-weblogic-operator-ns-weblogic-operator-clusterrolebinding-discovery       1s
-sample-weblogic-operator-ns-weblogic-operator-clusterrolebinding-general         1s
-sample-weblogic-operator-ns-weblogic-operator-clusterrolebinding-nonresource     1s
+sample-weblogic-operator-ns-weblogic-operator-clusterrolebinding-auth-delegator  0s
+sample-weblogic-operator-ns-weblogic-operator-clusterrolebinding-discovery       0s
+sample-weblogic-operator-ns-weblogic-operator-clusterrolebinding-general         0s
+sample-weblogic-operator-ns-weblogic-operator-clusterrolebinding-nonresource     0s
 
 ==> v1/ConfigMap
 NAME                  DATA  AGE
-weblogic-operator-cm  3     1s
+weblogic-operator-cm  3     0s
 
 ==> v1/Deployment
 NAME               READY  UP-TO-DATE  AVAILABLE  AGE
-weblogic-operator  0/1    1           0          0s
-
-==> v1/Pod(related)
-NAME                               READY  STATUS             RESTARTS  AGE
-weblogic-operator-86ff6fccc-wzxfw  0/1    ContainerCreating  0         0s
+weblogic-operator  0/1    0           0          0s
 
 ==> v1/Role
 NAME                    AGE
-weblogic-operator-role  1s
+weblogic-operator-role  0s
 
 ==> v1/RoleBinding
 NAME                                     AGE
@@ -165,24 +172,24 @@ weblogic-operator-rolebinding-namespace  0s
 
 ==> v1/Secret
 NAME                       TYPE    DATA  AGE
-weblogic-operator-secrets  Opaque  0     1s
+weblogic-operator-secrets  Opaque  0     0s
 
 ==> v1/Service
-NAME                            TYPE       CLUSTER-IP    EXTERNAL-IP  PORT(S)   AGE
-internal-weblogic-operator-svc  ClusterIP  10.96.36.114  <none>       8082/TCP  0s
+NAME                            TYPE       CLUSTER-IP   EXTERNAL-IP  PORT(S)   AGE
+internal-weblogic-operator-svc  ClusterIP  10.96.24.39  <none>       8082/TCP  0s
 ```
 
-Check the operator pod:
+Check the operator pod, supposed there are 2 component inside; weblogic-operator and logstash:
 ```
-$ kubectl get po -n sample-weblogic-operator-ns
-NAME                                READY   STATUS    RESTARTS   AGE
-weblogic-operator-86ff6fccc-wzxfw   1/1     Running   0          75s
+[opc@bastion1 weblogic-kubernetes-operator]$ kubectl get po -n sample-weblogic-operator-ns
+NAME                                 READY   STATUS    RESTARTS   AGE
+weblogic-operator-5bb44c9bd4-9m7rr   2/2     Running   0          15m
 ```
 Check the operator helm chart:
 ```
-$ helm list sample-weblogic-operator
+[opc@bastion1 weblogic-kubernetes-operator]$ helm list sample-weblogic-operator
 NAME                            REVISION        UPDATED                         STATUS          CHART                   APP VERSION     NAMESPACE
-sample-weblogic-operator        1               Tue Mar  3 07:37:47 2020        DEPLOYED        weblogic-operator-2.5.0                 sample-weblogic-operator-ns
+sample-weblogic-operator        1               Sat May  2 10:44:22 2020        DEPLOYED        weblogic-operator-2.5.0                 sample-weblogic-operator-ns
 ```
 
 The WebLogic Operator has been installed. You can continue with next tutorial module.
