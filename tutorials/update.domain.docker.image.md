@@ -1,6 +1,9 @@
-# Oracle WebLogic Operator Tutorial #
+# Update Docker image to improve existing WebLogic domain #
 
-To try to fix Win10 to run VirtualBox image run the following command in cmd:
+For this Hands on Lab we are going to improve the existing Docker image of existing WebLogic Domain that was created, with init tag. In this part we will update a docker image using WebLogic Image Tool and WebLogic Deploy Tool, and the improvement part comes by adding WebLogic Monitoring Exporter and WebLogic Logging Exporter into the WebLogic Domain, the illustration like below:
+
+![alt text](images/wit/wit.png)
+
 ```
 bcdedit /set hypervisorlaunchtype off
 ```
