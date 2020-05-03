@@ -57,7 +57,6 @@ This will demonstrate the process of moving existing WebLogic domain into docker
 This will demonstrate how to enable CI/CD process on the WebLogic domain, where everytime there is a new code commit in the code repository the whole process of creating image, deploying image will be done automatically, below is the illustrationg
 
 1. [Setup Oracle Container Pipelines (Wercker) to Enable CI/CD for WebLogic Application](tutorials/setup.oracle.pipeline.md)
-![](tutorials/images/readme2.png)
 2. [Deploy WebLogic Domain](tutorials/deploy.weblogic.md)
 3. [Deploy Ingress Load Balancer](tutorials/deploy.load.balancer.md)
 4. [Scaling WebLogic Cluster](tutorials/scale.weblogic.md)
@@ -65,6 +64,8 @@ This will demonstrate how to enable CI/CD process on the WebLogic domain, where 
 6. [Update Web Application](tutorials/update.application.md)
 7. [Assigning WebLogic Pods to Nodes](tutorials/node.selector.md)
 8. [Assigning WebLogic Pods to Licensed Nodes](tutorials/node.selector.license.md)
+
+![](tutorials/images/readme2.png)
 
 ## References ##
 
