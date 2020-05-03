@@ -4,7 +4,7 @@
 
 This Hands On Lab main purpose is to show how to move and improve existing WebLogic Domain so that WebLogic's user will still be able to experience WebLogic adaptation in this agile era. This hands on lab is made based on the [WebLogic Kubernetes Operator Documentation](https://oracle.github.io/weblogic-kubernetes-operator/) also various references and has been tested by May 2020. If you have any questions or inquiries please email me to tazlambert@gmail.com.
 
-**Note** This is a work in progress tutorial, will be updating as soon as finding some interesting topic to add.
+**Note:** This is a work in progress tutorial, will be updating as soon as finding some interesting topic to add.
 
 The Hands On Lab will demonstrates:
 + **Move and improve existing WebLogic Domain** using [Weblogic Deploy Tooling](https://github.com/oracle/weblogic-deploy-tooling) and [WebLogic Image Tool](https://github.com/oracle/weblogic-image-tool). WebLogic improve is done by REST enabling Weblogic metrics for monitoring using [WebLogic Monitoring Exporter](https://github.com/oracle/weblogic-monitoring-exporter) and making WebLogic Log into JSON to be consumed by Elasticsearch using [WebLogic Logging Exporter](https://github.com/oracle/weblogic-logging-exporter) 
