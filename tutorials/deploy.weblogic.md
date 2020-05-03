@@ -92,41 +92,13 @@ Upload domainKube.yaml to your Github repository and place it in the root direct
 ![](images/deploy.domain/001.uploadDomainKube.yaml.png)
 ![](images/deploy.domain/002.locationDomainKube.yaml.png)
 
-To create domain we need to create new workflow by clicking the **Worklflow** tab and then **Add new pipeline** to enable pipeline defined in *wercker.yml* in this case deploy-to-cluster pipeline.
+Go to the **Runs** tab and click ***trigger a build now*** link.
 
-![](images/deploy.domain/003.createNewPipeline.png)
+![alt text](images/build.weblogic.pipeline/014.run.build.png)
 
-Enter the name of the pipeline and the "YML Pipeline Name" as *deploy-to-cluster*. Please enter exactly this name - because this name is hardcoded in the *wercker.yml*. Click **Create**.
+To get more details about the current step click on the pipeline.
 
-![](images/deploy.domain/004.createNewPipelineb.png)
-
-Click again the **Worklflow** tab to get back to the editor page. Click the + sign after the mandatory *build* pipeline.
-
-![](images/deploy.domain/005.createNewPipelinec.png)
-
-Leave the default branch(es) configuration and select the *deploy-to-cluster* pipeline.
-
-![](images/deploy.domain/006.createNewPipelined.png)
-
-Your final workflow should be similar below:
-
-![](images/deploy.domain/007.createNewPipelinee.png)
-
-Go to the **Runs** tab and click ***build-domain-in-home-image***.
-
-![](images/deploy.domain/008.activateNewPipeline.png)
-
-Go click the **Actions** button and click ***deploy-to-cluster***.
-
-![](images/deploy.domain/009.activateNewPipelineb.png)
-
-Click **Execute Pipeline** button.
-
-![](images/deploy.domain/010.activateNewPipelinec.png)
-
-When the workflow is completed the WebLogic is available in the kubernetes cluster.
-
-![](images/deploy.domain/011.activateNewPipelined.png)
+![alt text](images/build.weblogic.pipeline/015.running.png)
 
 Check the introspector job which needs to be run first:
 ```
