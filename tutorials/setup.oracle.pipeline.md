@@ -1,10 +1,10 @@
-# Build WebLogic container image using Oracle Container Pipelines (Wercker) #
+# Setup Oracle Container Pipelines (Wercker) to Enable CI/CD for WebLogic Application #
 
 **Oracle Container Pipelines (Wercker)** is a Docker-Native CI/CD  Automation platform for Kubernetes & Microservice Deployments. Wercker is integrated with Docker containers, which package up application code and can be easily moved from server to server. Each build artifact can be a Docker container. The user can take the container from the Docker Hub or his private registry and build the code before shipping it. Its SaaS platform enables developers to test and deploy code often. They can push software updates incrementally as they are ready, rather than in bundled dumps. It makes it easier for coders to practice continuous integration, a software engineering practice in which each change a developer makes to the codebase is constantly tested in the process so that software doesn’t break when it goes live.
 
 Oracle Container Pipelines is based on the concept of pipelines, which are automated workflows. Pipelines take pieces of code and automatically execute a series of steps upon that code.
 
-This tutorial demonstrates how to create Oracle Container Pipelines application (CI/CD) to build/update custom WebLogic container image using official WebLogic image from Docker Store as base source.
+This tutorial demonstrates how to create Oracle Container Pipelines application (CI/CD) to build/update custom WebLogic container image using customized Docker image or official WebLogic image from Docker Store as base source.
 
 The custom WebLogic Domain has the following components configured/deployed:
 
@@ -92,7 +92,10 @@ First create your Oracle Container Pipelines application. Oracle Container Pipel
 The following pipelines are predefined in the Oracle Container Pipelines configuration file ([wercker.yml](https://github.com/nagypeter/weblogic-operator-tutorial/blob/master/wercker.yml)):
 
 - **build**: Default and mandatory pipeline to start the workflow. It builds the demo Web Application using Maven.
-- **build-domain-in-home-image**: Pipeline which runs Docker build to create custom WebLogic container image. First time when no *latest* image available in repository it uses official WebLogic image from Docker Store as base image and runs WLST script to customise the image. Also copies the demo Web Application into the image and deploys using WLST. Once *latest* (tag) of the image is available in the repository then the workflow just builds the Web Application and update the *latest* image with the new application binaries. After the Docker build the pipeline produces a new image and pushes to the image repository (OCIR). Thus every time when changes happen in the sources and committed to Github. The image tag will be the commit hash tag of the source changes  which triggered the new build process. Also the historically latest gets the *latest* tag as well.
+- **build-domain-in-home-image**: Pipeline which runs Docker build to create custom WebLogic container image. 
+  When no *latest* image available in repository it uses official WebLogic image from Docker Store as base image and runs WLST script to customise the image. Also copies the demo Web Application into the image and deploys using WLST. 
+   When *latest* (tag) of the image is available in the repository then the workflow just builds the Web Application and update the *latest* image with the new application binaries. 
+   After the Docker build the pipeline produces a new image and pushes to the image repository (OCIR). Thus every time when changes happen in the sources and committed to Github. The image tag will be the commit hash tag of the source changes  which triggered the new build process. Also the historically latest gets the *latest* tag as well.
 - **deploy-to-cluster**: This pipeline will pull the image from image repository (OCIR) and deploy the image to the destined Kubernetes cluster.
 
 [Sign in to Oracle Container Pipelines (former Wercker)](https://app.wercker.com/) and click **Create your first application** button or the **+** icon at the top right corner and select *Add Application*.
@@ -153,25 +156,3 @@ Leave the default branch(es) configuration and select the *build-domain-in-home-
 Now your workflow should be similar below, deploy-to-cluster will be added later:
 
 ![alt text](images/build.weblogic.pipeline/013.workflow.done.png)
-
-Go to the **Runs** tab and click ***trigger a build now*** link.
-
-![alt text](images/build.weblogic.pipeline/014.run.build.png)
-
-To get more details about the current step click on the pipeline.
-
-![alt text](images/build.weblogic.pipeline/015.running.png)
-
-When the workflow is completed the WebLogic image is available in your image repository.
-
-![alt text](images/build.weblogic.pipeline/016.run.succeed.png)
-
-Open the OCI console page and go to the container registry console to check.
-
-![alt text](images/ocir/004.open.ocir.png)
-
-In the registry you have to find a repository named like your Oracle Container Pipelines application (e.g. *weblogic-operator-tutorial*). If you open the repository for more details you  find two images. Technically the two images are the same, but got two tags. One of them is the git commit hash tag which is uniquely identify the image. The second *latest* tag applied because to have easier access to the historically latest release/image.
-
-![alt text](images/build.weblogic.pipeline/017.ocir.image.check.png)
-
-Now the WebLogic domain image is ready to deploy on Kubernetes using WebLogic Operator.
