@@ -93,9 +93,9 @@ The following pipelines are predefined in the Oracle Container Pipelines configu
 
 - **build**: Default and mandatory pipeline to start the workflow. It builds the demo Web Application using Maven.
 - **build-domain-in-home-image**: Pipeline which runs Docker build to create custom WebLogic container image. 
-  When no *latest* image available in repository it uses official WebLogic image from Docker Store as base image and runs WLST script to customise the image. Also copies the demo Web Application into the image and deploys using WLST. 
-   When *latest* (tag) of the image is available in the repository then the workflow just builds the Web Application and update the *latest* image with the new application binaries. 
-   After the Docker build the pipeline produces a new image and pushes to the image repository (OCIR). Thus every time when changes happen in the sources and committed to Github. The image tag will be the commit hash tag of the source changes  which triggered the new build process. Also the historically latest gets the *latest* tag as well.
+    When no *latest* image available in repository it uses official WebLogic image from Docker Store as base image and runs WLST script to customise the image. Also copies the demo Web Application into the image and deploys using WLST. 
+    When *latest* (tag) of the image is available in the repository then the workflow just builds the Web Application and update the *latest* image with the new application binaries. 
+    After the Docker build the pipeline produces a new image and pushes to the image repository (OCIR). Thus every time when changes happen in the sources and committed to Github. The image tag will be the commit hash tag of the source changes  which triggered the new build process. Also the historically latest gets the *latest* tag as well.
 - **deploy-to-cluster**: This pipeline will pull the image from image repository (OCIR) and deploy the image to the destined Kubernetes cluster.
 
 [Sign in to Oracle Container Pipelines (former Wercker)](https://app.wercker.com/) and click **Create your first application** button or the **+** icon at the top right corner and select *Add Application*.
