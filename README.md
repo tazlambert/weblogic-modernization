@@ -2,7 +2,7 @@
 
 ## About this hands-on Hands On Lab ##
 
-This Hands On Lab main purpose is to show how to move and improve existing WebLogic Domain so that WebLogic's user will still be able to experience WebLogic adaptation in this agile era. This hands on lab is made based on the [WebLogic Kubernetes Operator Documentation](https://oracle.github.io/weblogic-kubernetes-operator/) also various references and has been tested by April 2020.
+This Hands On Lab main purpose is to show how to move and improve existing WebLogic Domain so that WebLogic's user will still be able to experience WebLogic adaptation in this agile era. This hands on lab is made based on the [WebLogic Kubernetes Operator Documentation](https://oracle.github.io/weblogic-kubernetes-operator/) also various references and has been tested by May 2020. If you have any questions or inquiries please email me to tazlambert@gmail.com.
 
 The Hands On Lab will demonstrates:
 + **Move and improve existing WebLogic Domain** using [Weblogic Deploy Tooling](https://github.com/oracle/weblogic-deploy-tooling) and [WebLogic Image Tool](https://github.com/oracle/weblogic-image-tool). WebLogic improve is done by REST enabling Weblogic metrics for monitoring using [WebLogic Monitoring Exporter](https://github.com/oracle/weblogic-monitoring-exporter) and making WebLogic Log into JSON to be consumed by Elasticsearch using [WebLogic Logging Exporter](https://github.com/oracle/weblogic-logging-exporter) 
@@ -56,6 +56,7 @@ This will demonstrate the process of moving existing WebLogic domain into docker
 
 This will demonstrate how to enable CI/CD process on the WebLogic domain, where everytime there is a new code commit in the code repository the whole process of creating image, deploying image will be done automatically, below is the illustrationg
 
+1. [Setup Oracle Container Pipelines (Wercker) to Enable CI/CD for WebLogic Application](tutorials/setup.oracle.pipeline.md)
 ![](tutorials/images/readme2.png)
 
 
