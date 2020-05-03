@@ -156,6 +156,42 @@ Leave the default branch(es) configuration and select the *build-domain-in-home-
 
 ![alt text](images/build.weblogic.pipeline/012.add.pipeline.details.png)
 
-Now your workflow should be similar below, deploy-to-cluster will be added later:
+Now your workflow should be similar below, deploy-to-cluster will be added after this:
 
 ![alt text](images/build.weblogic.pipeline/013.workflow.done.png)
+
+To deploy domain we need to create new workflow by clicking the **Worklflow** tab and then **Add new pipeline** to enable pipeline defined in *wercker.yml* in this case deploy-to-cluster pipeline.
+
+![](images/deploy.domain/003.createNewPipeline.png)
+
+Enter the name of the pipeline and the "YML Pipeline Name" as *deploy-to-cluster*. Please enter exactly this name - because this name is hardcoded in the *wercker.yml*. Click **Create**.
+
+![](images/deploy.domain/004.createNewPipelineb.png)
+
+Click again the **Worklflow** tab to get back to the editor page. Click the + sign after the mandatory *build* pipeline.
+
+![](images/deploy.domain/005.createNewPipelinec.png)
+
+Leave the default branch(es) configuration and select the *deploy-to-cluster* pipeline.
+
+![](images/deploy.domain/006.createNewPipelined.png)
+
+Your final workflow should be similar below:
+
+![](images/deploy.domain/007.createNewPipelinee.png)
+
+Go to the **Runs** tab and click ***build-domain-in-home-image***.
+
+![](images/deploy.domain/008.activateNewPipeline.png)
+
+Go click the **Actions** button and click ***deploy-to-cluster***.
+
+![](images/deploy.domain/009.activateNewPipelineb.png)
+
+Click **Execute Pipeline** button.
+
+![](images/deploy.domain/010.activateNewPipelinec.png)
+
+When the workflow is completed the WebLogic is available in the kubernetes cluster.
+
+![](images/deploy.domain/011.activateNewPipelined.png)
