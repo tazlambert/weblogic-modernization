@@ -48,6 +48,7 @@ This will demonstrate the process of moving existing WebLogic domain into docker
 2. [Create Docker image from existing WebLogic domain](tutorials/create.domain.docker.image.md)
 3. [Setup Oracle Kubernetes Engine to orchestrate the Docker image](tutorials/setup.oke.md)
 4. [Setup WebLogic Kubernetes Operator to orchestrate WebLogic in Kubernetes](tutorials/setup.wko.md)
+5. [Update Docker image to improve existing WebLogic domain](tutorials/update.domain.docker.image.md)
 
 ![](tutorials/images/readme1.png)
 
