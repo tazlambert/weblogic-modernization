@@ -435,3 +435,4 @@ Successfully built 8a20216dd9a1
 Successfully tagged phx.ocir.io/axrtkaqgdfo8/wls-move-improve:latest
 [INFO   ] Build successful. Build time=325s. Image tag=phx.ocir.io/axrtkaqgdfo8/wls-move-improve:latest
 ```
+With the update process being successfull then we can start with the next part of the lab with to topic to automate code changes and deployment.
