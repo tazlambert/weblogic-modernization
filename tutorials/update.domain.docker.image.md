@@ -29,6 +29,7 @@ cd
 mkdir update
 cd update
 ```
+![alt text](images/wme/wme.png)
 Create WebLogic Monitoring Exporter config file from [template](https://github.com/oracle/weblogic-monitoring-exporter/blob/master/samples/kubernetes/end2end/dashboard/exporter-config.yaml) Download the binary file for WebLogic Monitoring Exporter:
 ```
 curl -L -O https://github.com/oracle/weblogic-monitoring-exporter/releases/download/v1.1.2/wls-exporter.war
@@ -95,6 +96,7 @@ queries:
     prefix: wls_jta_
     key: name
 ```
+![alt text](images/wle/wle.png)
 Create WebLogic Logging Exporter config file from [template](https://github.com/oracle/weblogic-logging-exporter/blob/master/samples/WebLogicLoggingExporter.yaml) Download the binary file for WebLogic Logging Exporter 
 ```
 curl -L -O https://github.com/oracle/weblogic-logging-exporter/releases/download/v1.0.0/weblogic-logging-exporter-1.0.0.jar
