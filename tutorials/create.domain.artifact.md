@@ -212,6 +212,7 @@ appDeployments:
 | PasswordEncrypted | welcome1 | datasource user password |
 
 Which will make the model file like below:
+#### Original WDT Model ####
 ```
 domainInfo:
     AdminUserName: 'weblogic'
