@@ -92,7 +92,7 @@ Upload domainKube.yaml to your Github repository and place it in the root direct
 ![](images/deploy.domain/001.uploadDomainKube.yaml.png)
 ![](images/deploy.domain/002.locationDomainKube.yaml.png)
 
-Go to the **Runs** tab and click ***trigger a build now*** link.
+Open the Wercker consol and go to the **Runs** tab and click ***trigger a build now*** link.
 
 ![alt text](images/build.weblogic.pipeline/014.run.build.png)
 
