@@ -12,25 +12,6 @@ The Hands On Lab will demonstrates:
 
 This lab is designed for people with no some experience with OCI, Kubernetes, WebLogic, and no experience with WebLogic Tooling, Container Registry, Docker and want to learn the core concepts and basics of how to run WebLogic JEE application on Kubernetes environment.
 
-## Components ##
-
-By the time this hands on lab created below are the tools that being used and its version:
-
-### WebLogic Tooling ###
-+ **[Oracle Weblogic Deploy Tooling (WDT) v1.7.3](https://github.com/oracle/weblogic-deploy-tooling/releases/tag/weblogic-deploy-tooling-1.7.3)** 
-+ **[Oracle Weblogic Image Tooling (WIT) v1.8.4](https://github.com/oracle/weblogic-image-tool/releases/tag/release-1.8.4)** 
-+ **[Oracle Weblogic Monitoring Exporter (WME) v1.1.2](https://github.com/oracle/weblogic-monitoring-exporter/releases/tag/v1.1.2)** 
-+ **[Oracle Weblogic Logging Exporter (WLE) v1.0.0](https://github.com/oracle/weblogic-logging-exporter/releases/tag/v1.0.0)** 
-+ **[Oracle Weblogic Kubernetes Operator (WKO) v2.5.0](https://github.com/oracle/weblogic-kubernetes-operator/releases/tag/v2.5.0)** 
-### Others Tooling ###
-+ **[Oracle Command Line Interface (OCI) v2.10.1](https://github.com/oracle/oci-cli/releases/tag/v2.10.1)**
-+ **[Kubectl v1.18.0](https://github.com/kubernetes/kubectl/releases/tag/kubernetes-1.18.0)**  
-+ **[Helm v2.16.6](https://github.com/helm/helm/releases/tag/v2.16.6)** 
-+ **[Kubernetes v1.15.7](https://docs.cloud.oracle.com/en-us/iaas/releasenotes/changes/37013251-39b2-4c08-8536-906d76bba789/)** 
-+ **[Kube Prometheus v0.3.0](https://github.com/coreos/kube-prometheus/releases/tag/v0.3.0)** 
-+ **[Elasticsearch v6.8.0](https://github.com/elastic/elasticsearch/releases/tag/v6.8.0)** 
-+ **[Kibana v6.8.0](https://github.com/elastic/kibana/releases/tag/v6.8.0)** 
-
 ## Prerequisites ##
 
 + **[Oracle Cloud Infrastructure](https://cloud.oracle.com/en_US/cloud-infrastructure)** enabled account. The tutorial has been tested using [Trial account](https://myservices.us.oraclecloud.com/mycloud/signup) (as of April, 2020).
@@ -59,15 +40,35 @@ This will demonstrate the process of moving existing WebLogic domain into docker
 This will demonstrate how to enable CI/CD process on the WebLogic domain, where everytime there is a new code commit in the code repository the whole process of creating image, deploying image will be done automatically, below is the illustrationg
 
 1. [Setup Oracle Container Pipelines (Wercker) to Enable CI/CD for WebLogic Application](tutorials/setup.oracle.pipeline.md)
-2. [Deploy WebLogic Domain](tutorials/deploy.weblogic.md)
-3. [Deploy Ingress Load Balancer](tutorials/deploy.load.balancer.md)
-4. [Scaling WebLogic Cluster](tutorials/scale.weblogic.md)
-5. [Override JDBC Datasource parameters](tutorials/override.jdbc.md)
-6. [Update Web Application](tutorials/update.application.md)
-7. [Assigning WebLogic Pods to Nodes](tutorials/node.selector.md)
-8. [Assigning WebLogic Pods to Licensed Nodes](tutorials/node.selector.license.md)
+2. [Setup Prometheus and Grafana for WebLogic Monitoring](tutorials/setup.prometheus.grafana.md)
+3. [Deploy WebLogic Domain](tutorials/deploy.weblogic.md)
+4. [Deploy Ingress Load Balancer](tutorials/deploy.load.balancer.md)
+5. [Scaling WebLogic Cluster](tutorials/scale.weblogic.md)
+6. [Override JDBC Datasource parameters](tutorials/override.jdbc.md)
+7. [Update Web Application](tutorials/update.application.md)
+8. [Assigning WebLogic Pods to Nodes](tutorials/node.selector.md)
+9. [Assigning WebLogic Pods to Licensed Nodes](tutorials/node.selector.license.md)
 
 ![](tutorials/images/readme2.png)
+
+## Components ##
+
+By the time this hands on lab created below are the tools that being used and its version:
+
+### WebLogic Tooling ###
++ **[Oracle Weblogic Deploy Tooling (WDT) v1.7.3](https://github.com/oracle/weblogic-deploy-tooling/releases/tag/weblogic-deploy-tooling-1.7.3)** 
++ **[Oracle Weblogic Image Tooling (WIT) v1.8.5](https://github.com/oracle/weblogic-image-tool/releases/tag/release-1.8.5)** 
++ **[Oracle Weblogic Monitoring Exporter (WME) v1.1.2](https://github.com/oracle/weblogic-monitoring-exporter/releases/tag/v1.1.2)** 
++ **[Oracle Weblogic Logging Exporter (WLE) v1.0.0](https://github.com/oracle/weblogic-logging-exporter/releases/tag/v1.0.0)** 
++ **[Oracle Weblogic Kubernetes Operator (WKO) v2.5.0](https://github.com/oracle/weblogic-kubernetes-operator/releases/tag/v2.5.0)** 
+### Others Tooling ###
++ **[Oracle Command Line Interface (OCI) v2.10.1](https://github.com/oracle/oci-cli/releases/tag/v2.10.1)**
++ **[Kubectl v1.18.0](https://github.com/kubernetes/kubectl/releases/tag/kubernetes-1.18.0)**  
++ **[Helm v2.16.6](https://github.com/helm/helm/releases/tag/v2.16.6)** 
++ **[Kubernetes v1.15.7](https://docs.cloud.oracle.com/en-us/iaas/releasenotes/changes/37013251-39b2-4c08-8536-906d76bba789/)** 
++ **[Kube Prometheus v0.3.0](https://github.com/coreos/kube-prometheus/releases/tag/v0.3.0)** 
++ **[Elasticsearch v6.8.0](https://github.com/elastic/elasticsearch/releases/tag/v6.8.0)** 
++ **[Kibana v6.8.0](https://github.com/elastic/kibana/releases/tag/v6.8.0)** 
 
 ## References ##
 
