@@ -1,4 +1,4 @@
-# Setup Prometheus and Grafana for WebLogic Monitoring #
+# Setup End to End Monitoring for WebLogic Domain in Kubernetes #
 
 ### Preparation  ###
 
@@ -515,3 +515,148 @@ We can try to login to Grafana dashboard and it will show this welcome page and 
 
 Since there are no WebLogic Domain deployed in the Kubernetes it will show N/A
 ![alt text](images/progra/grafana_dash.png)
+
+#### Setup Webhook as Notification Receiver ####
+Let's set up a simple webhook as the notification receiver. The webhook is written in a Python script which simply logs all the received notifications. Typically, webhook receivers are often used to notify systems that Alertmanager doesn’t support directly, the script will look like this:
+```
+# Copyright 2019, Oracle Corporation and/or its affiliates. All rights reserved.
+# Licensed under the Universal Permissive License v 1.0 as shown at http://oss.oracle.com/licenses/upl.
+
+import json
+from http.server import BaseHTTPRequestHandler
+from http.server import HTTPServer
+
+class LogHandler(BaseHTTPRequestHandler):
+    def do_POST(self):
+        print
+        self.send_response(200)
+        self.end_headers()
+        if 'Content-Type' in self.headers and self.headers['Content-Type'] == 'application/json':
+          if 'Content-Length' not in self.headers:
+            print('Receiving a json request, but not an alert.')
+            return
+          length = int(self.headers['Content-Length'])
+          data = json.loads(self.rfile.read(length).decode('utf-8'))
+          for alert in data["alerts"]:
+            print('!!! Receiving an alert.')
+            print(json.dumps(alert, indent=2))
+        else:
+          print('Receiving a non-json post.')
+
+
+PORT = 8080
+
+if __name__ == '__main__':
+   httpd = HTTPServer(('', PORT), LogHandler)
+   print ('Webhook is serving at port', PORT)
+   httpd.serve_forever()
+```
+Now we need to create docker image that will host the above code:
+```
+[opc@bastion1 end2end]$ docker build ./webhook -t webhook-log:1.0 -t phx.ocir.io/axrtkaqgdfo8/webhook-log:1.0
+Sending build context to Docker daemon  6.144kB
+Step 1/4 : FROM python:3.7
+Trying to pull repository docker.io/library/python ...
+3.7: Pulling from docker.io/library/python
+90fe46dd8199: Pull complete
+35a4f1977689: Pull complete
+bbc37f14aded: Pull complete
+74e27dc593d4: Pull complete
+4352dcff7819: Pull complete
+deb569b08de6: Pull complete
+1aa33568be24: Pull complete
+a8034acd5893: Pull complete
+5ae88975c1eb: Pull complete
+Digest: sha256:0032cd9c0542133c8c9dc79fb25992203b6dd2bf4c9ff9f6b5f09298061a867c
+Status: Downloaded newer image for python:3.7
+ ---> 84d66a048f90
+Step 2/4 : WORKDIR /usr/src/app
+ ---> Running in 24eab6cb6aac
+Removing intermediate container 24eab6cb6aac
+ ---> c7dcf0c04e38
+Step 3/4 : COPY scripts/* ./
+ ---> 89c3a066a327
+Step 4/4 : CMD ["python", "-u", "./server.py"]
+ ---> Running in 75cdd30a1656
+Removing intermediate container 75cdd30a1656
+ ---> ebf080d866b0
+Successfully built ebf080d866b0
+Successfully tagged webhook-log:1.0
+Successfully tagged phx.ocir.io/axrtkaqgdfo8/webhook-log:1.0
+[opc@bastion1 end2end]$ docker push phx.ocir.io/axrtkaqgdfo8/webhook-log:1.0
+The push refers to repository [phx.ocir.io/axrtkaqgdfo8/webhook-log]
+8027486a1048: Pushed
+8a899b0b4f1a: Pushed
+fc5f48f1ecdc: Pushed
+86120ec29f78: Pushed
+5d34cecc2826: Pushed
+baf481fca4b7: Pushed
+3d3e92e98337: Pushed
+8967306e673e: Pushed
+9794a3b3ed45: Pushed
+5f77a51ade6a: Pushed
+e40d297cf5f8: Pushed
+1.0: digest: sha256:2179c7005923c32ba9fcf1290e3d62c008860f079823a859afd20231d75f2980 size: 2631
+```
+This will add new repository in the OCIR, phx.ocir.io/axrtkaqgdfo8/webhook-log, then we need to create new pod in the kubernetes, below is the yaml file:
+```
+# Copyright 2017, 2019, Oracle Corporation and/or its affiliates. All rights reserved.
+# Licensed under the Universal Permissive License v 1.0 as shown at http://oss.oracle.com/licenses/upl.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webhook
+  namespace: webhook
+  labels:
+    app: webhook
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webhook
+  template:
+    metadata:
+      labels:
+        app: webhook
+    spec:
+      containers:
+      - image: phx.ocir.io/axrtkaqgdfo8/webhook-log:1.0
+        imagePullPolicy: Always
+        name: webhook
+      imagePullSecrets:
+      - name: ocirwebhooksecret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webhook
+  namespace: webhook
+  labels:
+    app: webhook
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+  selector:
+    app: webhook
+ ```
+The value in the image parameter can be replaced with the one in the OCIR, but we need to create the secret that can access the OCIR
+ ```
+kubectl create secret docker-registry ocirwebhooksecret -n webhook --docker-server=phx.ocir.io --docker-username='axrtkaqgdfo8/oracleidentitycloudservice/john.p.smith@testing.com' --docker-password='xxxxxxx' --docker-email='john.p.smith@testing.com'
+ ```
+and here is the executions:
+ ```
+[opc@bastion1 end2end]$ kubectl create ns webhook
+namespace/webhook created
+[opc@bastion1 end2end]$ kubectl apply -f ./webhook/server.yaml
+deployment.apps/webhook created
+service/webhook created
+[opc@bastion1 end2end]$ kubectl -n webhook get pod -l app=webhook
+NAME                       READY   STATUS    RESTARTS   AGE
+webhook-774c7f9c47-bz85n   1/1     Running   0          2m16s
+[opc@bastion1 end2end]$ kubectl -n webhook get svc -l app=webhook
+NAME      TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)    AGE
+webhook   ClusterIP   10.96.56.3   <none>        8080/TCP   2m28s
+ ```
+After this everything already done and can continue with WebLogic Domain deployment.
