@@ -40,46 +40,90 @@ secret/ocirsecret created
 ```
 Then now we need to create PV and PVC for this domain:
 ```
-cat << EOF | kubectl apply -f -
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: wls-k8s-domain-pv
-  labels:
-    weblogic.resourceVersion: domain-v2
-    # weblogic.domainUID:
-spec:
-  storageClassName: wls-k8s-domain-storage-class
-  capacity:
-    storage: 10Gi
-  accessModes:
-    - ReadWriteMany
-  # Valid values are Retain, Delete or Recycle
-  persistentVolumeReclaimPolicy: Retain
-  nfs:
-    server: 10.0.10.9
-    path: "/shared/logs"
-EOF
+cd
+cd weblogic-kubernetes-operator/kubernetes/samples/scripts/create-weblogic-domain-pv-pvc
+mkdir output
+vi create-pv-pvc-inputs.yaml
 ```
+Edit the input file
 ```
-cat << EOF | kubectl apply -f -
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: wls-k8s-domain-pvc
-  namespace: wls-k8s-domain-ns
-  labels:
-    weblogic.resourceVersion: domain-v2
-    #weblogic.domainUID: domain1	
-spec:
-  storageClassName: wls-k8s-domain-storage-class
-  resources:
-    requests:
-      storage: 10Gi
-  accessModes:
-    - ReadWriteOnce
-EOF
+# Copyright (c) 2018, 2020, Oracle Corporation and/or its affiliates.
+# Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
+
+# The version of this inputs file.  Do not modify.
+version: create-weblogic-sample-domain-pv-pvc-inputs-v1
+
+# The base name of the pv and pvc
+baseName: wls-k8s-domain
+
+# Unique ID identifying a domain.
+# If left empty, the generated pv can be shared by multiple domains
+# This ID must not contain an underscope ("_"), and must be lowercase and unique across all domains in a Kubernetes cluster.
+domainUID:
+
+# Name of the namespace for the persistent volume claim
+namespace: wls-k8s-domain-ns
+
+# Persistent volume type for the persistent storage.
+# The value must be 'HOST_PATH' or 'NFS'.
+# If using 'NFS', weblogicDomainStorageNFSServer must be specified.
+weblogicDomainStorageType: NFS
+
+# The server name or ip address of the NFS server to use for the persistent storage.
+# The following line must be uncomment and customized if weblogicDomainStorateType is NFS:
+weblogicDomainStorageNFSServer: 10.0.10.9
+
+# Physical path of the persistent storage.
+# When weblogicDomainStorageType is set to HOST_PATH, this value should be set the to path to the
+# domain storage on the Kubernetes host.
+# When weblogicDomainStorageType is set to NFS, then weblogicDomainStorageNFSServer should be set
+# to the IP address or name of the DNS server, and this value should be set to the exported path
+# on that server.
+# Note that the path where the domain is mounted in the WebLogic containers is not affected by this
+# setting, that is determined when you create your domain.
+# The following line must be uncomment and customized:
+weblogicDomainStoragePath: /shared/logs
+
+# Reclaim policy of the persistent storage
+# The valid values are: 'Retain', 'Delete', and 'Recycle'
+weblogicDomainStorageReclaimPolicy: Retain
+
+# Total storage allocated to the persistent storage.
+weblogicDomainStorageSize: 10Gi
 ```
+After finish editing the input file then we can execute the process to create new PV n PVC for WebLogic image:
+```
+[opc@bastion1 create-weblogic-domain-pv-pvc]$ ./create-pv-pvc.sh -i create-pv-pvc-inputs.yaml -o output/ -e
+Input parameters being used
+export version="create-weblogic-sample-domain-pv-pvc-inputs-v1"
+export baseName="wls-k8s-domain"
+export namespace="wls-k8s-domain-ns"
+export weblogicDomainStorageType="NFS"
+export weblogicDomainStorageNFSServer="10.0.10.9"
+export weblogicDomainStoragePath="/shared/logs"
+export weblogicDomainStorageReclaimPolicy="Retain"
+export weblogicDomainStorageSize="10Gi"
+
+Generating output//pv-pvcs/wls-k8s-domain-pv.yaml
+Generating output//pv-pvcs/wls-k8s-domain-pvc.yaml
+Checking if the persistent volume wls-k8s-domain-pv exists
+The persistent volume wls-k8s-domain-pv does not exist
+Creating the persistent volume wls-k8s-domain-pv
+persistentvolume/wls-k8s-domain-pv created
+Checking if the persistent volume wls-k8s-domain-pv is Available
+Checking if the persistent volume claim wls-k8s-domain-pvc in NameSpace wls-k8s-domain-ns exists
+No resources found in wls-k8s-domain-ns namespace.
+The persistent volume claim wls-k8s-domain-pvc does not exist in NameSpace wls-k8s-domain-ns
+Creating the persistent volume claim wls-k8s-domain-pvc
+persistentvolumeclaim/wls-k8s-domain-pvc created
+Checking if the persistent volume wls-k8s-domain-pv is Bound
+The following files were generated:
+  output//pv-pvcs/wls-k8s-domain-pv.yaml
+  output//pv-pvcs/wls-k8s-domain-pvc.yaml
+
+Completed
+```
+
 #### Update WebLogic Operator configuration ####
 
 Once you have your domain namespace (WebLogic domain not yet deployed) you have to update loadbalancer's and operator's configuration about where the domain will be deployed.
