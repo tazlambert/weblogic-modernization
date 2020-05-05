@@ -28,7 +28,7 @@ spec:
   # Update this with the name of the Docker image that will be used to run your domain:
   #image: "YOUR_OCI_REGION_CODE.ocir.io/YOUR_TENANCY_NAME/weblogic-operator-tutorial:latest"
   #image: "fra.ocir.io/johnpsmith/weblogic-operator-tutorial:latest"
-  image: "phx.ocir.io/axseivdauftz/weblogic-operator-tutorial:latest"
+  image: "phx.ocir.io/axrtkaqgdfo8/wls-move-improve:latest"
 
   # imagePullPolicy defaults to "Always" if image version is :latest
   imagePullPolicy: "Always"
@@ -49,12 +49,12 @@ spec:
 
   # If you want to use a mounted volume as the log home, i.e. to persist logs outside the container, then
   # uncomment this and set it to `true`:
-  # logHomeEnabled: false
+  logHomeEnabled: true
   # The in-pod name of the directory to store the domain, node manager, server logs, and server .out
   # files in.
   # If not specified or empty, domain log file, server logs, server out, and node manager log files
   # will be stored in the default logHome location of /shared/logs/<domainUID>/.
-  # logHome: /shared/logs/domain1
+  logHome: /shared/logs/wls-k8s-domain
 
   # serverStartPolicy legal values are "NEVER", "IF_NEEDED", or "ADMIN_ONLY"
   # This determines which WebLogic Servers the Operator will start up when it discovers this Domain
@@ -76,13 +76,13 @@ spec:
     # If you are storing your domain on a persistent volume (as opposed to inside the Docker image),
     # then uncomment this section and provide the PVC details and mount path here (standard images
     # from Oracle assume the mount path is `/shared`):
-    # volumes:
-    # - name: weblogic-domain-storage-volume
-    #   persistentVolumeClaim:
-    #     claimName: domain1-weblogic-sample-pvc
-    # volumeMounts:
-    # - mountPath: /shared
-    #   name: weblogic-domain-storage-volume
+    volumes:
+    - name: weblogic-domain-storage-volume
+      persistentVolumeClaim:
+        claimName: wls-k8s-domain-pvc
+    volumeMounts:
+    - mountPath: /shared/logs
+      name: weblogic-domain-storage-volume
 
   # adminServer is used to configure the desired behavior for starting the administration server.
   adminServer:
