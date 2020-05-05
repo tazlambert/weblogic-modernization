@@ -2,53 +2,92 @@
 
 ### Deploy WebLogic domain  ###
 
+In this step we are going to deploy the WebLogic Image with Domain and Application in Pods while the logs will be placed in Persistent Volume.
+
+![alt text](images/deploy.domain/deployDomain.png)
+
 #### Preparing the Kubernetes cluster to run WebLogic domains ####
 
 Create the domain namespace:
 ```
-kubectl create namespace wls-k8s-domain-ns
+[opc@bastion1 ~]$ kubectl create namespace wls-k8s-domain-ns
+namespace/wls-k8s-domain-ns created
 ```
 Create a Kubernetes secret containing the Administration Server boot credentials:
 ```
-kubectl -n wls-k8s-domain-ns create secret generic wls-k8s-domain-weblogic-credentials \
-  --from-literal=username=weblogic \
-  --from-literal=password=welcome1
+[opc@bastion1 ~]$ kubectl -n wls-k8s-domain-ns create secret generic wls-k8s-domain-weblogic-credentials --from-literal=username=weblogic --from-literal=password=welcome1
+secret/wls-k8s-domain-weblogic-credentials created
 ```
 Label the secret with domainUID:
 ```
-kubectl label secret wls-k8s-domain-weblogic-credentials \
-  -n wls-k8s-domain-ns \
-  weblogic.domainUID=wls-k8s-domain \
-  weblogic.domainName=wls-k8s-domain
+[opc@bastion1 ~]$ kubectl label secret wls-k8s-domain-weblogic-credentials -n wls-k8s-domain-ns weblogic.domainUID=wls-k8s-domain weblogic.domainName=wls-k8s-domain
+secret/wls-k8s-domain-weblogic-credentials labeled
 ```
 Create OCI image Registry secret to allow Kubernetes to pull you custome WebLogic image. Replace the registry server region code, username and auth token respectively.
-WARNING!!! - be careful about username - docker-username parameter should have a value of YOUR_TENACY_NAME/YOUR_OCIR_USERNAME - don't skip YOUR_TENANCY_NAME please.
+WARNING!!! - be careful about username - docker-username parameter should have a value of YOUR_TENANCY_NAME/YOUR_OCIR_USERNAME - don't skip YOUR_TENANCY_NAME please.
 ```
 kubectl create secret docker-registry ocirsecret \
   -n wls-k8s-domain-ns \
   --docker-server=YOUR_HOME_REGION_CODE.ocir.io \
-  --docker-username='YOUR_TANACY_NAME/YOUR_OCIR_USERNAME' \
+  --docker-username='YOUR_TENANCY_NAME/YOUR_OCIR_USERNAME' \
   --docker-password='YOUR_OCIR_AUTH_TOKEN' \
   --docker-email='YOUR_EMAIL'
 ```
 For example:
 ```
-$ kubectl create secret docker-registry ocirsecret \
-  -n wls-k8s-domain-ns \
-  --docker-server=fra.ocir.io \
-  --docker-username='johnpsmith/oracleidentitycloudservice/john.p.smith@example.com' \
-  --docker-password='my_auth_token_generated_earlier' \
-  --docker-email='john.p.smith@example.com'
-  secret "ocirsecret" created
+[opc@bastion1 ~]$ kubectl create secret docker-registry ocirsecret -n wls-k8s-domain-ns --docker-server=phx.ocir.io --docker-username='axrtkaqgdfo8/oracleidentitycloudservice/john.p.smith@testing.com' --docker-password='xxxxxxxxxx' --docker-email='john.p.smith@testing.com'
+secret/ocirsecret created
 ```
-
+Then now we need to create PV and PVC for this domain:
+```
+cat << EOF | kubectl apply -f -
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: wls-k8s-domain-pv
+  labels:
+    weblogic.resourceVersion: domain-v2
+    # weblogic.domainUID:
+spec:
+  storageClassName: wls-k8s-domain-storage-class
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteMany
+  # Valid values are Retain, Delete or Recycle
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: 10.0.10.9
+    path: "/shared/logs"
+EOF
+```
+```
+cat << EOF | kubectl apply -f -
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wls-k8s-domain-pvc
+  namespace: wls-k8s-domain-ns
+  labels:
+    weblogic.resourceVersion: domain-v2
+    #weblogic.domainUID: domain1	
+spec:
+  storageClassName: wls-k8s-domain-storage-class
+  resources:
+    requests:
+      storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+EOF
+```
 #### Update WebLogic Operator configuration ####
 
 Once you have your domain namespace (WebLogic domain not yet deployed) you have to update loadbalancer's and operator's configuration about where the domain will be deployed.
 
 Make sure before execute domain `helm` install you are in the WebLogic Operator's local Git repository folder.
 ```
-cd /u01/content/weblogic-kubernetes-operator/
+cd
+cd weblogic-kubernetes-operator/
 ```
 To update operator execute the following `helm upgrade` command:
 ```
@@ -84,6 +123,11 @@ Set the following values:
 |imagePullPolicy:|"Always"||
 |imagePullSecrets: <br>- name:|imagePullSecrets: <br>- name: ocirsecret||
 |webLogicCredentialsSecret: <br>&nbsp;name:|webLogicCredentialsSecret: <br>&nbsp;name: wls-k8s-domain-weblogic-credentials||
+|imagePullPolicy:|"Always"||
+|logHomeEnabled:|true||
+|logHome:|/shared/logs/wls-k8s-domain||
+|volume:|claimName: wls-k8s-domain-pvc||
+|volumeMounts:|mountPath: /shared/logs||
 
 Your `domainKube.yaml` should be almost the same what is [available in the imported tutorial repository (click the link if you want to compare and check)](https://github.com/tazlambert/weblogic-operator-tutorial/blob/master/domainKube.yaml).
 
