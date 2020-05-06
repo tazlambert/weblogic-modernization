@@ -645,12 +645,12 @@ spec:
  ```
 The value in the image parameter can be replaced with the one in the OCIR, but we need to create the secret that can access the OCIR
  ```
-kubectl create secret docker-registry ocirwebhooksecret -n webhook --docker-server=phx.ocir.io --docker-username='axrtkaqgdfo8/oracleidentitycloudservice/john.p.smith@testing.com' --docker-password='xxxxxxx' --docker-email='john.p.smith@testing.com'
+[opc@bastion1 end2end]$ kubectl create ns webhook
+namespace/webhook created
+[opc@bastion1 end2end]$ kubectl create secret docker-registry ocirwebhooksecret -n webhook --docker-server=phx.ocir.io --docker-username='axrtkaqgdfo8/oracleidentitycloudservice/john.p.smith@testing.com' --docker-password='xxxxxxx' --docker-email='john.p.smith@testing.com'
  ```
 and here is the executions:
  ```
-[opc@bastion1 end2end]$ kubectl create ns webhook
-namespace/webhook created
 [opc@bastion1 end2end]$ kubectl apply -f ./webhook/server.yaml
 deployment.apps/webhook created
 service/webhook created
