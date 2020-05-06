@@ -45,7 +45,8 @@ Please repeat the same process several times, in this case;
 Open the access to bastion then put this command to create PV and PVC for Prometheus Alert:
 ```
 kubectl create namespace monitoring
-
+```
+```
 cat << EOF | kubectl apply -f -
 apiVersion: v1
 kind: PersistentVolume
@@ -61,10 +62,8 @@ spec:
   nfs:
     server: 10.0.10.9
     path: "/shared/alert"
-EOF    
-```
-```
-cat << EOF | kubectl apply -f -
+
+---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -97,10 +96,8 @@ spec:
   nfs:
     server: 10.0.10.9
     path: "/shared/prometheus"
-EOF
-```
-```
-cat << EOF | kubectl apply -f -
+
+---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -116,7 +113,47 @@ spec:
     - ReadWriteOnce
 EOF
 ```
-Grafana suppose to use PV and PVC but since Grafana have permission issue to use existing PVC, we will enable the persistence but instead using PV PVC it will use Oracle Block Volume.
+Last for Grafana PV and PVC, Grafana will requires its mounted directory to be in full permission mode (777) to do that we need to mount the /shared/grafana to the bastion and create root folder and give 777 permission:
+```
+sudo mkdir /mnt/grafana
+sudo mount 10.0.10.9:/shared/grafana /mnt/grafana
+sudo mkdir /mnt/grafana/root
+sudo chmod -Rf 777 /mnt/grafana/root
+```
+```
+cat << EOF | kubectl apply -f -
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-grafana
+
+spec:
+  storageClassName: grafana
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: 10.0.10.9
+    path: "/shared/grafana/root"
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-grafana
+  namespace: monitoring
+
+spec:
+  storageClassName: grafana
+  resources:
+    requests:
+      storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+EOF
+```
 
 ### Setup  ###
 
@@ -329,6 +366,7 @@ From the same directory we try to install Grafana by making sure if the configur
 ```
 persistence:
   enabled: true
+  existingClaim: pvc-grafana
 service:
   type: NodePort
   port: 80
@@ -345,53 +383,49 @@ Then we can start the execution:
 secret/grafana-secret created
 [opc@bastion1 end2end]$ helm install --wait --name grafana --namespace monitoring --values grafana/values.yaml stable/grafana
 NAME:   grafana
-E0504 15:09:31.451763   11877 portforward.go:372] error copying from remote stream to local connection: readfrom tcp4 127.0.0.1:40145->127.0.0.1:40018: write tcp4 127.0.0.1:40145->127.0.0.1:40018: write: broken pipe
-LAST DEPLOYED: Mon May  4 15:07:56 2020
+E0506 09:04:39.208852   13466 portforward.go:372] error copying from remote stream to local connection: readfrom tcp4 127.0.0.1:34743->127.0.0.1:39822: write tcp4 127.0.0.1:34743->127.0.0.1:39822: write: broken pipe
+LAST DEPLOYED: Wed May  6 09:04:04 2020
 NAMESPACE: monitoring
 STATUS: DEPLOYED
 
 RESOURCES:
 ==> v1/ClusterRole
 NAME                 AGE
-grafana-clusterrole  94s
+grafana-clusterrole  35s
 
 ==> v1/ClusterRoleBinding
 NAME                        AGE
-grafana-clusterrolebinding  94s
+grafana-clusterrolebinding  35s
 
 ==> v1/ConfigMap
 NAME          DATA  AGE
-grafana       1     95s
-grafana-test  1     94s
+grafana       1     35s
+grafana-test  1     35s
 
 ==> v1/Deployment
 NAME     READY  UP-TO-DATE  AVAILABLE  AGE
-grafana  1/1    1           1          94s
-
-==> v1/PersistentVolumeClaim
-NAME     STATUS  VOLUME                                                                             CAPACITY  ACCESS MODES  STORAGECLASS  AGE
-grafana  Bound   ocid1.volume.oc1.phx.abyhqljsmilpogocybhd4oelhbxfq6bumxdpazshodoryj6kzbfvffstktyq  50Gi      RWO           oci           94s
+grafana  1/1    1           1          35s
 
 ==> v1/Pod(related)
 NAME                     READY  STATUS   RESTARTS  AGE
-grafana-96c8dc8dc-hf9wx  1/1    Running  0         94s
+grafana-96c8dc8dc-vxstl  1/1    Running  0         35s
 
 ==> v1/Role
 NAME          AGE
-grafana-test  94s
+grafana-test  35s
 
 ==> v1/RoleBinding
 NAME          AGE
-grafana-test  94s
+grafana-test  35s
 
 ==> v1/Service
 NAME     TYPE      CLUSTER-IP     EXTERNAL-IP  PORT(S)       AGE
-grafana  NodePort  10.96.189.232  <none>       80:31000/TCP  94s
+grafana  NodePort  10.96.114.123  <none>       80:31000/TCP  35s
 
 ==> v1/ServiceAccount
 NAME          SECRETS  AGE
-grafana       1        94s
-grafana-test  1        94s
+grafana       1        35s
+grafana-test  1        35s
 
 ==> v1beta1/PodSecurityPolicy
 NAME          PRIV   CAPS      SELINUX   RUNASUSER  FSGROUP   SUPGROUP  READONLYROOTFS  VOLUMES
@@ -400,11 +434,11 @@ grafana-test  false  RunAsAny  RunAsAny  RunAsAny   RunAsAny  false     configMa
 
 ==> v1beta1/Role
 NAME     AGE
-grafana  94s
+grafana  35s
 
 ==> v1beta1/RoleBinding
 NAME     AGE
-grafana  94s
+grafana  35s
 
 
 NOTES:
@@ -424,18 +458,24 @@ export NODE_PORT=$(kubectl get --namespace monitoring -o jsonpath="{.spec.ports[
 
 3. Login with the password from step 1 and the username: admin
 ```
-As mentioned before using the configuration value above, it will create its own block volume to store its data:
+Now we can check the available POD and Service that run in monitoring namespaces:
 ```
-[opc@bastion1 end2end]$ kubectl get pvc -n monitoring
-NAME               STATUS   VOLUME                                                                              CAPACITY   ACCESS MODES   STORAGECLASS   AGE
-grafana            Bound    ocid1.volume.oc1.phx.abyhqljsmilpogocybhd4oelhbxfq6bumxdpazshodoryj6kzbfvffstktyq   50Gi       RWO            oci            18m
-pvc-alertmanager   Bound    pv-alertmanager                                                                     10Gi       RWO            alertmanager   10h
-pvc-prometheus     Bound    pv-prometheus                                                                       10Gi       RWO            prometheus     10h
-[opc@bastion1 end2end]$ kubectl get pv
-NAME                                                                                CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                         STORAGECLASS   REASON   AGE
-ocid1.volume.oc1.phx.abyhqljsmilpogocybhd4oelhbxfq6bumxdpazshodoryj6kzbfvffstktyq   50Gi       RWO            Delete           Bound    monitoring/grafana            oci                     18m
-pv-alertmanager                                                                     10Gi       RWO            Retain           Bound    monitoring/pvc-alertmanager   alertmanager            10h
-pv-prometheus                                                                       10Gi       RWO            Retain           Bound    monitoring/pvc-prometheus     prometheus              10h
+[opc@bastion1 end2end]$ kubectl get svc -n monitoring
+NAME                            TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+grafana                         NodePort    10.96.114.123   <none>        80:31000/TCP   18m
+prometheus-alertmanager         NodePort    10.96.222.140   <none>        80:32000/TCP   21m
+prometheus-kube-state-metrics   ClusterIP   10.96.53.190    <none>        8080/TCP       21m
+prometheus-node-exporter        ClusterIP   None            <none>        9100/TCP       21m
+prometheus-server               NodePort    10.96.20.253    <none>        80:30000/TCP   21m
+
+[opc@bastion1 end2end]$ kubectl get po -n monitoring -o wide
+NAME                                             READY   STATUS    RESTARTS   AGE   IP           NODE         NOMINATED NODE   READINESS GATES
+grafana-96c8dc8dc-vxstl                          1/1     Running   0          18m   10.244.1.7   10.0.10.12   <none>           <none>
+prometheus-alertmanager-6d95b65944-mxpx6         2/2     Running   0          22m   10.244.0.6   10.0.10.13   <none>           <none>
+prometheus-kube-state-metrics-685dccc6d8-xpd8j   1/1     Running   0          22m   10.244.0.5   10.0.10.13   <none>           <none>
+prometheus-node-exporter-46fwp                   1/1     Running   0          22m   10.0.10.12   10.0.10.12   <none>           <none>
+prometheus-node-exporter-5jzzh                   1/1     Running   0          22m   10.0.10.13   10.0.10.13   <none>           <none>
+prometheus-server-6f549849db-bkrx5               2/2     Running   0          22m   10.244.0.7   10.0.10.13   <none>           <none>
 ```
 We can check through the correct Node IP and Node Port to access the dashboard:
 ![alt text](images/progra/grafana.png)
