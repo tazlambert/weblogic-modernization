@@ -38,6 +38,13 @@ For example:
 [opc@bastion1 ~]$ kubectl create secret docker-registry ocirsecret -n wls-k8s-domain-ns --docker-server=phx.ocir.io --docker-username='axrtkaqgdfo8/oracleidentitycloudservice/john.p.smith@testing.com' --docker-password='xxxxxxxxxx' --docker-email='john.p.smith@testing.com'
 secret/ocirsecret created
 ```
+Now for WebLogic Domain log, it will requires its mounted directory to be in full permission mode (777) to do that we need to mount the /shared/logs to the bastion and create root folder and give 777 permission:
+```
+sudo mkdir /mnt/logs
+sudo mount 10.0.10.9:/shared/logs /mnt/logs
+sudo mkdir /mnt/logs/wls-k8s-domain
+sudo chmod -Rf 777 /mnt/logs/wls-k8s-domain
+```
 Then now we need to create PV and PVC for this domain:
 ```
 cd
