@@ -44,6 +44,7 @@ Please repeat the same process several times, in this case;
 
 Open the access to bastion then put this command to create PV and PVC for Prometheus Alert:
 ```
+kubectl create namespace monitoring
 cat << EOF | kubectl apply -f -
 apiVersion: v1
 kind: PersistentVolume
