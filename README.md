@@ -56,7 +56,7 @@ This will demonstrate how to enable CI/CD process on the WebLogic domain, where 
 By the time this hands on lab created below are the tools that being used and its version:
 
 ### WebLogic Tooling ###
-+ **[Oracle Weblogic Deploy Tooling (WDT) v1.7.3](https://github.com/oracle/weblogic-deploy-tooling/releases/tag/weblogic-deploy-tooling-1.7.3)** 
++ **[Oracle Weblogic Deploy Tooling (WDT) v1.8.1](https://github.com/oracle/weblogic-deploy-tooling/releases/tag/weblogic-deploy-tooling-1.8.1)** 
 + **[Oracle Weblogic Image Tooling (WIT) v1.8.5](https://github.com/oracle/weblogic-image-tool/releases/tag/release-1.8.5)** 
 + **[Oracle Weblogic Monitoring Exporter (WME) v1.1.2](https://github.com/oracle/weblogic-monitoring-exporter/releases/tag/v1.1.2)** 
 + **[Oracle Weblogic Logging Exporter (WLE) v1.0.0](https://github.com/oracle/weblogic-logging-exporter/releases/tag/v1.0.0)** 
@@ -79,6 +79,8 @@ By the time this hands on lab created below are the tools that being used and it
 5. [Oracle WebLogic Monitoring Exporter](https://github.com/oracle/weblogic-monitoring-exporter/blob/master/README.md)
 6. [Oracle WebLogic Logging Exporter](https://github.com/oracle/weblogic-logging-exporter/blob/master/README.md)
 7. [Oracle Weblogic Server Kubernetes Operator Samples](https://github.com/oracle/weblogic-kubernetes-operator/tree/master/kubernetes/samples)
+8. [Oracle WebLogic Tutorial](https://github.com/nagypeter/weblogic-operator-tutorial)
+9. [End to end example of monitoring WebLogic Server in Kubernetes](https://blogs.oracle.com/weblogicserver/end-to-end-example-of-monitoring-weblogic-server-with-grafana-dashboards-on-the-oci-container-engine-for-kubernetes)
 
 ## License ##
 Copyright (c) 2020 Oracle and/or its affiliates
