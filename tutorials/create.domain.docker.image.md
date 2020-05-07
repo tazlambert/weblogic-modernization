@@ -47,7 +47,7 @@ Before we can store docker image to OCIR we need to get our Oracle Container Reg
 
 After all 3 components being gathered we can try to login to the OCIR repository using docker command.
 ```
-[opc@bastion1 ~]$ docker login phx.ocir.io -u axrtkaqgdfo8/oracleidentitycloudservice/john.p.smith@testing.com
+docker login phx.ocir.io -u axrtkaqgdfo8/oracleidentitycloudservice/john.p.smith@testing.com
 ```
 The expected result will be:
 ```
@@ -60,16 +60,14 @@ Login Succeeded
 ```
 
 #### Prepare Java SDK and Docker in bastion ####
-First we need to download [Java SDK](https://www.oracle.com/java/technologies/javase-jdk8-downloads.html), in this case we choose 8u251, and upload that to bastion host 
+First we need to download [Java SDK](https://www.oracle.com/java/technologies/javase-jdk8-downloads.html), in this case we choose 8u251, and upload that to bastion host in the directory /home/opc
 ```
-[opc@bastion1 ~]$ pwd
-/home/opc
-[opc@bastion1 ~]$ gzip -d jdk-8u251-linux-x64.tar.gz
-[opc@bastion1 ~]$ tar -xvf jdk-8u251-linux-x64.tar
+gzip -d jdk-8u251-linux-x64.tar.gz
+tar -xvf jdk-8u251-linux-x64.tar
+vi .bashrc
 ```
-Edit .bashrc file to put JDK binary into PATH
+Edit .bashrc file to put JDK binary into PATH and create JAVA_HOME like below:
 ```
-[opc@bastion1 ~]$ vi .bashrc
 # .bashrc
 
 # Source global definitions
@@ -84,11 +82,17 @@ export PATH=$JAVA_HOME/bin:$PATH
 # export SYSTEMD_PAGER=
 
 # User specific aliases and functions
-[opc@bastion1 ~]$ source .bashrc
-[opc@bastion1 ~]$ java -version
-Java(TM) SE Runtime Environment (build 1.8.0_251-b08)
-Java HotSpot(TM) 64-Bit Server VM (build 25.251-b08, mixed mode)
 ```
+Then after that 
+```
+source .bashrc
+java -version
+```
+The expected output is like below
+
+    Java(TM) SE Runtime Environment (build 1.8.0_251-b08)
+    Java HotSpot(TM) 64-Bit Server VM (build 25.251-b08, mixed mode)
+
 Most of the time, there is no out of the box docker capability, so we need to enable docker engine in the OS, otherwise we cannot login to OCIR repository. To do that you need to have sudo or root privileges, and do the following:
 ```
 [opc@bastion1 ~]$ sudo -i
