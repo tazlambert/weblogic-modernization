@@ -1,6 +1,4 @@
-# Oracle WebLogic Operator Tutorial #
-
-### Deploy WebLogic domain  ###
+# Deploy WebLogic Domain to Kubernetes #
 
 In this step we are going to deploy the WebLogic Image with Domain and Application in Pods while the logs will be placed in Persistent Volume.
 
