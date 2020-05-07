@@ -1,6 +1,4 @@
-# Oracle WebLogic Operator Tutorial #
-
-### Override domain configuration  ###
+# Override JDBC Datasource Parameters #
 
 You can modify the WebLogic domain configuration for both the "domain in persistent volume" and the "domain in image" options before deploying a domain resource:
 
