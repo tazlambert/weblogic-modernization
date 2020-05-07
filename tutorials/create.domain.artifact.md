@@ -16,38 +16,34 @@ Login the to WebLogic Domain OS using appropriate user and locate the domain dir
 
 ![alt text](images/wdt/wdt1.png)
 
-After being able to login to the OS, the next step will be downloading weblogic deploying tool from [github site](https://github.com/oracle/weblogic-deploy-tooling/releases) choose the release that will be used, in this case 1.7.3, right click on the weblogic-deploy.zip and copy the link.
-
-![alt text](images/wdt/wdt2.png)
+After being able to login to the OS, the next step will be downloading weblogic deploying tool from [github site](https://github.com/oracle/weblogic-deploy-tooling/releases) choose the release that will be used, in this case 1.8.1, right click on the weblogic-deploy.zip and copy the link.
 
 After that download it using curl command line then unzip the file.
 ```
-curl -O -L https://github.com/oracle/weblogic-deploy-tooling/releases/download/weblogic-deploy-tooling-1.7.3/weblogic-deploy.zip  
+curl -O -L https://github.com/oracle/weblogic-deploy-tooling/releases/download/weblogic-deploy-tooling-1.8.1/weblogic-deploy.zip  
 ```
 Below is the result:
 ```
-[oracle@ee2c50d23970 ~]$ curl -O -L https://github.com/oracle/weblogic-deploy-tooling/releases/download/weblogic-deploy-tooling-1.7.3/weblogic-deploy.zip
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
 100   632  100   632    0     0    753      0 --:--:-- --:--:-- --:--:--   754
 100 1034k  100 1034k    0     0   728k      0  0:00:01  0:00:01 --:--:--  728k
-[oracle@ee2c50d23970 ~]$ unzip weblogic-deploy.zip
-Archive:  weblogic-deploy.zip
-   creating: weblogic-deploy/
 ```
 Go to the extracted directory and go to bin folder and execute discover domain command to create the artifact, several parameter that being used are:
+```
+unzip weblogic-deploy.zip
+cd weblogic-deploy/bin
+./discoverDomain.sh -oracle_home /u01/oracle/ -domain_home /u01/oracle/user_projects/domains/wls-k8s-domain/ -archive_file wls-k8s-domain.zip -model_file wls-k8s-domain.yaml 
+```
 | Key | Value | Note |
 |----------------|---------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | oracle_home | /u01/oracle/ |  The path location where oracle middleware was installed |
 | domain_home | /u01/oracle/user_projects/domains/wls-k8s-domain/ | The path location where existing WebLogic Domain was installed |
 | [archive_file](https://github.com/oracle/weblogic-deploy-tooling/blob/master/site/archive.md) | wls-k8s-domain.zip | The archive to deploy binaries and other file resources to the target domain  |
 | [model_file](https://github.com/oracle/weblogic-deploy-tooling#the-metadata-model) | wls-k8s-domain.yaml | The file to describe the domain and applications |
-```
-./discoverDomain.sh -oracle_home /u01/oracle/ -domain_home /u01/oracle/user_projects/domains/wls-k8s-domain/ -archive_file wls-k8s-domain.zip -model_file wls-k8s-domain.yaml 
-```
+
 Below is the result:
 ```
-[oracle@ee2c50d23970 bin]$ ./discoverDomain.sh -oracle_home /u01/oracle/ -domain_home /u01/oracle/user_projects/domains/wls-k8s-domain/ -archive_file wls-k8s-domain.zip -model_file wls-k8s-domain.yaml
 set JVM version to minor  8
 JDK version is 1.8.0_251-b08
 JAVA_HOME = /u01/jdk
@@ -64,7 +60,7 @@ Welcome to WebLogic Server Administration Scripting Shell
 
 Type help() for help on available commands
 
-####<Apr 30, 2020 9:09:51 AM> <INFO> <WebLogicDeployToolingVersion> <logVersionInfo> <WLSDPLY-01750> <The WebLogic Deploy Tooling discoverDomain version is 1.7.3:master.4f1ebfc:Apr 03, 2020 18:05 UTC>
+####<Apr 30, 2020 9:09:51 AM> <INFO> <WebLogicDeployToolingVersion> <logVersionInfo> <WLSDPLY-01750> <The WebLogic Deploy Tooling discoverDomain version is 1.8.1:master.4f1ebfc:Apr 03, 2020 18:05 UTC>
 ####<Apr 30, 2020 9:09:52 AM> <INFO> <discover> <main> <WLSDPLY-06024> <No variable file provided. Model passwords will contain the token '-- FIX ME --'>
 ####<Apr 30, 2020 9:10:16 AM> <INFO> <discover> <_get_domain_name> <WLSDPLY-06022> <Discover domain wls-k8s-domain>
 ####<Apr 30, 2020 9:10:16 AM> <INFO> <TopologyDiscoverer> <discover> <WLSDPLY-06600> <Discovering domain model topology>
@@ -108,7 +104,7 @@ Type help() for help on available commands
 ####<Apr 30, 2020 9:10:47 AM> <INFO> <Validator> <__validate_model_section> <WLSDPLY-05008> <Validating the kubernetes section of the model file>
 ####<Apr 30, 2020 9:10:47 AM> <INFO> <Validator> <__validate_model_section> <WLSDPLY-05009> <Model file /home/oracle/weblogic-deploy/bin/wls-k8s-domain.yaml does not contain a kubernetes section, validation of kubernetes was skipped.>
 
-Issue Log for discoverDomain version 1.7.3 running WebLogic version 12.2.1.4.0 offline mode:
+Issue Log for discoverDomain version 1.8.1 running WebLogic version 12.2.1.4.0 offline mode:
 
 Total:       WARNING :     0    SEVERE :     0
 
