@@ -33,6 +33,7 @@ The service that is created a elasticsearch that accessible within the Kubernete
 NAME                             READY   STATUS    RESTARTS   AGE     IP           NODE        NOMINATED NODE   READINESS GATES
 elasticsearch-6858c54456-m2gxm   1/1     Running   0          4m23s   10.244.2.6   10.0.10.4   <none>           <none>
 kibana-6d74455686-jc29k          1/1     Running   0          4m23s   10.244.0.6   10.0.10.2   <none>           <none>
+
 [opc@bastion1 elasticsearch-and-kibana]$ kubectl get services
 NAME            TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)             AGE
 elasticsearch   ClusterIP   10.96.236.194   <none>        9200/TCP,9300/TCP   4m46s
@@ -126,6 +127,9 @@ Note the values:
 - **name**: name of the resource
 - **namespace**: where the operator deployed
 - **values**: custom values for WebLogic Operator parameter, especially connecting it to elasticsearch.
+  - **elkIntegrationEnabled**: auto integration flag with ELK stack
+  - **elasticSearchHost**: ip address of the elasticsearch IP
+  - **elasticSearchPort**: port of the elasticsearch
 
 Execute the following `helm install`:
 ```
