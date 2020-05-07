@@ -41,8 +41,8 @@ This will demonstrate how to enable CI/CD process on the WebLogic domain, where 
 
 1. [Setup Oracle Container Pipelines (Wercker) to Enable CI/CD for WebLogic Application](tutorials/setup.oracle.pipeline.md)
 2. [Setup Prometheus and Grafana for WebLogic Monitoring](tutorials/setup.prometheus.grafana.md)
-3. [Deploy WebLogic Domain](tutorials/deploy.weblogic.md)
-4. [Deploy Ingress Load Balancer](tutorials/deploy.load.balancer.md)
+3. [Deploy WebLogic Domain to Kubernetes](tutorials/deploy.weblogic.md)
+4. [Deploy Ingress Load Balancer for WebLogic in Kubernetes](tutorials/deploy.load.balancer.md)
 5. [Scaling WebLogic Cluster](tutorials/scale.weblogic.md)
 6. [Override JDBC Datasource parameters](tutorials/override.jdbc.md)
 7. [Update Web Application](tutorials/update.application.md)
