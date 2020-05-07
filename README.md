@@ -2,7 +2,7 @@
 
 ## About this hands-on Hands On Lab ##
 
-This Hands On Lab main purpose is to show how to move and improve existing WebLogic Domain so that WebLogic's user will still be able to experience WebLogic adaptation in this agile era. This hands on lab is made based on the [WebLogic Kubernetes Operator Documentation](https://oracle.github.io/weblogic-kubernetes-operator/) also various references and has been tested by May 2020. If you have any questions or inquiries please email me to tazlambert@gmail.com.
+This Hands On Lab main purpose is to show how to modernization of existing WebLogic Domain so that WebLogic's user will be able to experience WebLogic's improvement in this agile era. This hands on lab is made based on the [WebLogic Kubernetes Operator Documentation](https://oracle.github.io/weblogic-kubernetes-operator/) also various references and has been tested by May 2020. If you have any questions or inquiries please email me to tazlambert@gmail.com.
 
 **Note:** This is a work in progress tutorial, will be updating as soon as finding some interesting topic to add.
 
@@ -10,12 +10,12 @@ The Hands On Lab will demonstrates:
 + **Move and improve existing WebLogic Domain** using [Weblogic Deploy Tooling](https://github.com/oracle/weblogic-deploy-tooling) and [WebLogic Image Tool](https://github.com/oracle/weblogic-image-tool). WebLogic improve is done by REST enabling Weblogic metrics for monitoring using [WebLogic Monitoring Exporter](https://github.com/oracle/weblogic-monitoring-exporter) and making WebLogic Log into JSON to be consumed by Elasticsearch using [WebLogic Logging Exporter](https://github.com/oracle/weblogic-logging-exporter) 
 + **Automating WebLogic Domain Lifecycle in CI/CD process**, which will include working with [Oracle Cloud Infrastructure](https://docs.cloud.oracle.com/en-us/iaas/Content/GSG/Concepts/baremetalintro.htm), [Oracle Container Pipelines/Wercker](https://docs.oracle.com/en/cloud/iaas/wercker-cloud/wercm/), [Oracle Container Engine for Kubernetes](https://docs.cloud.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengoverview.htm), [Github](https://github.com/), [Oracle Registry](https://docs.cloud.oracle.com/en-us/iaas/Content/Registry/Concepts/registryoverview.htm), and lastly [WebLogic Kubernetes Operator](https://github.com/oracle/weblogic-kubernetes-operator).
 
-This lab is designed for people with no some experience with OCI, Kubernetes, WebLogic, and no experience with WebLogic Tooling, Container Registry, Docker and want to learn the core concepts and basics of how to run WebLogic JEE application on Kubernetes environment.
+This lab is designed for people with some experience with OCI, Kubernetes, WebLogic, and no experience with WebLogic Tooling, Container Registry, Docker and want to learn the core concepts and basics of how to run WebLogic JEE application on Kubernetes environment.
 
 ## Prerequisites ##
 
 + **[Oracle Cloud Infrastructure](https://cloud.oracle.com/en_US/cloud-infrastructure)** enabled account. The tutorial has been tested using [Trial account](https://myservices.us.oraclecloud.com/mycloud/signup) (as of April, 2020).
-+ **Desktop with Oracle Cloud Infrastructure CLI, kubectl, helm.** Preferred to have bastion host in OCI
++ **Linux Desktop with Oracle Cloud Infrastructure CLI, kubectl, helm.** Preferred to have bastion host in OCI
 + **[Docker](https://hub.docker.com/signup) account.**
 + **[Github](https://github.com/join) account.**
 + **[Oracle Container Pipeline](https://app.wercker.com/users/new?return_url=/) account.**
