@@ -979,4 +979,4 @@ init: digest: sha256:29e81bcbb9baa4ade58876ce717ad718052e23a86246e046489c1acbe40
 [opc@bastion1 bin]$
 ```
 When done, we can check from the OCIR if the image is there
-![alt text](images/wit/wit_ocir_1.png)
+![alt text](images/wit/wit_ocir.png)
