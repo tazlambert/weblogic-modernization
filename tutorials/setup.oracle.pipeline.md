@@ -161,7 +161,7 @@ build:
         name: Maven build - MBean Sample application
         code: mvn clean package
 ```
-The second part is where the Oracle Container Pipeline main task is to update or create Docker image and also store the update Docker image back to OCIR, those Docker image contained custom WebLogic Domain with its application.
+The second part is where the Oracle Container Pipeline main task is to update or create Docker image and also store the update Docker image back to OCIR, those Docker image contained custom WebLogic Domain with its application. This part show some easier integration with linux alpine box and docker daemon.
 ```
 build-domain-in-home-image:
   box:
@@ -202,16 +202,12 @@ deploy-to-cluster:
   box:
       id: alpine
       cmd: /bin/sh
-
   steps:
-
   - bash-template
- 
   - script:
       name: "Visualise Kubernetes config"
       working-dir: /pipeline/source
       code: cat domainKube.yaml
-
   - kubectl:
       name: deploy to kubernetes
       server: $KUBERNETES_MASTER
@@ -220,3 +216,4 @@ deploy-to-cluster:
       working-dir: /pipeline/source
       command: apply -f domainKube.yaml
 ```
+With this the Oracle Container Pipeline is ready to do CI/CD for WebLogic Domain.
