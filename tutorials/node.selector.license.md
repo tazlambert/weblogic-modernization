@@ -1,6 +1,4 @@
-# Oracle WebLogic Operator Tutorial #
-
-### Assigning WebLogic Pods to Licensed Node ###
+# Assigning WebLogic Pods to Licensed Node #
 
 This use case similar to described in [Assigning WebLogic Pods to Nodes lab](node.selector.md) where individual servers/pods were asssigned to specific node(s). However the focus in this use case on the license coverage.
 
