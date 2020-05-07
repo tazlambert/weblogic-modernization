@@ -151,19 +151,72 @@ Your final workflow should be similar below:
 ![](images/build.weblogic.pipeline/017.workflow.done.png)
 
 ---
+Above configurations is linkend into wercker.yaml files that located in the root directory of the github repository, the file we can divide into 3 parts, the first one is to build the demo applications using maven
+```
+no-response-timeout: 15
+box: combient/java-mvn
+build:
+  steps:
+    - script:
+        name: Maven build - MBean Sample application
+        code: mvn clean package
+```
+The second part is where the Oracle Container Pipeline main task is to update or create Docker image and also store the update Docker image back to OCIR, those Docker image contained custom WebLogic Domain with its application.
+```
+build-domain-in-home-image:
+  box:
+      id: alpine
+      cmd: /bin/sh
+  docker: true
+  steps:
+    - script:
+        name: Install curl and docker
+        code: apk --no-cache add curl docker
+    - script:
+        name: Build docker image
+        code: |
+              docker login $REGION.ocir.io -u $TENANCY/$OCI_REGISTRY_USERNAME -p $OCI_REGISTRY_PASSWORD
+              if docker pull $REGION.ocir.io/$TENANCY/$WERCKER_APPLICATION_NAME:latest; then
+                docker build --file Dockerfile.update \
+                    --build-arg SOURCEIMAGE=$REGION.ocir.io/$TENANCY/$WERCKER_APPLICATION_NAME:latest \
+                    --force-rm=true \
+                    -t $REGION.ocir.io/$TENANCY/$WERCKER_APPLICATION_NAME:$WERCKER_GIT_COMMIT \
+                    -t $REGION.ocir.io/$TENANCY/$WERCKER_APPLICATION_NAME:latest .
+              else
+                docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+                docker build --file Dockerfile.create \
+                    --force-rm=true \
+                    -t $REGION.ocir.io/$TENANCY/$WERCKER_APPLICATION_NAME:$WERCKER_GIT_COMMIT \
+                    -t $REGION.ocir.io/$TENANCY/$WERCKER_APPLICATION_NAME:latest .
+              fi
+    - script:
+        name: Push the image to a repository
+        code: |
+              docker login $REGION.ocir.io -u $TENANCY/$OCI_REGISTRY_USERNAME -p $OCI_REGISTRY_PASSWORD
+              docker push $REGION.ocir.io/$TENANCY/$WERCKER_APPLICATION_NAME:$WERCKER_GIT_COMMIT
+              docker push $REGION.ocir.io/$TENANCY/$WERCKER_APPLICATION_NAME:latest
+```
+The third part is in charge in deploying the Docker image into the destined Kubernetes cluster based on domainKube.yaml file in github repository
+```
+deploy-to-cluster:
+  box:
+      id: alpine
+      cmd: /bin/sh
 
-Go to the **Runs** tab and click ***build-domain-in-home-image***.
+  steps:
 
-![](images/deploy.domain/008.activateNewPipeline.png)
+  - bash-template
+ 
+  - script:
+      name: "Visualise Kubernetes config"
+      working-dir: /pipeline/source
+      code: cat domainKube.yaml
 
-Go click the **Actions** button and click ***deploy-to-cluster***.
-
-![](images/deploy.domain/009.activateNewPipelineb.png)
-
-Click **Execute Pipeline** button.
-
-![](images/deploy.domain/010.activateNewPipelinec.png)
-
-When the workflow is completed the WebLogic is available in the kubernetes cluster.
-
-![](images/deploy.domain/011.activateNewPipelined.png)
+  - kubectl:
+      name: deploy to kubernetes
+      server: $KUBERNETES_MASTER
+      token: $KUBERNETES_AUTH_TOKEN
+      insecure-skip-tls-verify: true
+      working-dir: /pipeline/source
+      command: apply -f domainKube.yaml
+```
