@@ -85,14 +85,14 @@ export PATH=$JAVA_HOME/bin:$PATH
 ```
 Then after that 
 ```
-source .bashrc
+**_source .bashrc_**
 java -version
 ```
 The expected output is like below
-
-    Java(TM) SE Runtime Environment (build 1.8.0_251-b08)
-    Java HotSpot(TM) 64-Bit Server VM (build 25.251-b08, mixed mode)
-
+```
+Java(TM) SE Runtime Environment (build 1.8.0_251-b08)
+Java HotSpot(TM) 64-Bit Server VM (build 25.251-b08, mixed mode)
+```
 Most of the time, there is no out of the box docker capability, so we need to enable docker engine in the OS, otherwise we cannot login to OCIR repository. To do that you need to have sudo or root privileges, and do the following:
 ```
 [opc@bastion1 ~]$ sudo -i
