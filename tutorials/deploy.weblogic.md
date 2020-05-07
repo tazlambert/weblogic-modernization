@@ -181,7 +181,7 @@ Your `domainKube.yaml` should be almost the same what is [available in the impor
 
 Upload domainKube.yaml to your Github repository and place it in the root directory:
 
-![](images/deploy.domain/uploadDomainKube.yaml.png)
+![](images/deploy.domain/uploadDomainKube.png)
 
 To deploy for the first time it can be invoked using this command in bastion:
 ```
