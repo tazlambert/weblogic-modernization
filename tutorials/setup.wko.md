@@ -126,7 +126,7 @@ Note the values:
 
 - **name**: name of the resource
 - **namespace**: where the operator deployed
-- **values**: custom values for WebLogic Operator parameter, especially connecting it to elasticsearch.
+- **values**: files contain custom values for WebLogic Operator parameter, named wkoValues.yaml
   - **elkIntegrationEnabled**: auto integration flag with ELK stack
   - **elasticSearchHost**: ip address of the elasticsearch IP
   - **elasticSearchPort**: port of the elasticsearch
