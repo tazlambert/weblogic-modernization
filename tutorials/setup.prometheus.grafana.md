@@ -227,13 +227,13 @@ serverFiles:
               summary: 'Some wls cluster is in warning state.'
 
 extraScrapeConfigs: |
-    - job_name: 'wls-domain1'
+    - job_name: 'wls-k8s-domain'
       kubernetes_sd_configs:
       - role: pod
       relabel_configs:
       - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_pod_label_weblogic_domainUID, __meta_kubernetes_pod_label_weblogic_clusterName]
         action: keep
-        regex: default;domain1;cluster-1
+        regex: wls-k8s-domain-ns;wls-k8s-domain;cluster-1
       - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
         action: replace
         target_label: __metrics_path__
@@ -252,6 +252,16 @@ extraScrapeConfigs: |
         username: weblogic
         password: welcome1
 ```
+The most important part for Prometheus configuration is in extraScrapeConfigs, some value that need to change:
+| Key | Value | Note |
+|----------------|---------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| job_name | wls-k8s-domain | Use WebLogic Domain name |
+| __meta_kubernetes_namespace | wls-k8s-domain-ns | Fill in regex planned WebLogic Domain Kubernetes Namespace |
+| __meta_kubernetes_pod_label_weblogic_domainUID | wls-k8s-domain | Fill in regex planned WebLogic Domain Kubernetes Domain UID |
+| __meta_kubernetes_pod_label_weblogic_clusterName | cluster1 | Fill in regex planned WebLogic Domain Kubernetes Cluster |
+| username | weblogic | Fill WebLogic Username |
+| password | welcome1 | Fill WebLogic Password |
+
 After checking we can proceed with the installation process:
 ```
 [opc@bastion1 prometheus]$ helm install --wait --name prometheus --namespace monitoring --values prometheus/values.yaml stable/prometheus
@@ -352,6 +362,7 @@ prometheus-node-exporter-fs4bf             1/1     Running   0          3m17s
 prometheus-node-exporter-mxxws             1/1     Running   0          3m17s
 prometheus-node-exporter-twzkf             1/1     Running   0          3m17s
 prometheus-server-6f549849db-6rjjf         2/2     Running   0          3m17s
+
 [opc@bastion1 end2end]$ kubectl -n monitoring get svc -l app=prometheus
 NAME                       TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
 prometheus-alertmanager    NodePort    10.96.9.228     <none>        80:32000/TCP   3m31s
@@ -493,7 +504,7 @@ This will be done by creating a datasource for Grafana, this will make Prometheu
   "basicAuth":false
 }
 ```
-Make sure the URL point to the correct Node IP and Node Port, then to apply this we can use this command:
+Make sure the URL point to the correct Node IP and Node Port of Prometheus Server, then to apply this we can use this command:
 ```
 opc@bastion1 end2end]$ curl -v -H 'Content-Type: application/json' -H "Content-Type: application/json" -X POST http://admin:welcome1@10.0.10.4:31000/api/datasources/ --data-binary @grafana/datasource.json
 * About to connect() to 10.0.10.4 port 31000 (#0)
