@@ -10,18 +10,15 @@ In this step we are going to deploy the WebLogic Image with Domain and Applicati
 
 Create the domain namespace:
 ```
-[opc@bastion1 ~]$ kubectl create namespace wls-k8s-domain-ns
-namespace/wls-k8s-domain-ns created
+kubectl create namespace wls-k8s-domain-ns
 ```
 Create a Kubernetes secret containing the Administration Server boot credentials:
 ```
-[opc@bastion1 ~]$ kubectl -n wls-k8s-domain-ns create secret generic wls-k8s-domain-weblogic-credentials --from-literal=username=weblogic --from-literal=password=welcome1
-secret/wls-k8s-domain-weblogic-credentials created
+kubectl -n wls-k8s-domain-ns create secret generic wls-k8s-domain-weblogic-credentials --from-literal=username=weblogic --from-literal=password=welcome1
 ```
 Label the secret with domainUID:
 ```
-[opc@bastion1 ~]$ kubectl label secret wls-k8s-domain-weblogic-credentials -n wls-k8s-domain-ns weblogic.domainUID=wls-k8s-domain weblogic.domainName=wls-k8s-domain
-secret/wls-k8s-domain-weblogic-credentials labeled
+kubectl label secret wls-k8s-domain-weblogic-credentials -n wls-k8s-domain-ns weblogic.domainUID=wls-k8s-domain weblogic.domainName=wls-k8s-domain
 ```
 Create OCI image Registry secret to allow Kubernetes to pull you custome WebLogic image. Replace the registry server region code, username and auth token respectively.
 WARNING!!! - be careful about username - docker-username parameter should have a value of YOUR_TENANCY_NAME/YOUR_OCIR_USERNAME - don't skip YOUR_TENANCY_NAME please.
@@ -35,8 +32,7 @@ kubectl create secret docker-registry ocirsecret \
 ```
 For example:
 ```
-[opc@bastion1 ~]$ kubectl create secret docker-registry ocirsecret -n wls-k8s-domain-ns --docker-server=phx.ocir.io --docker-username='axrtkaqgdfo8/oracleidentitycloudservice/john.p.smith@testing.com' --docker-password='xxxxxxxxxx' --docker-email='john.p.smith@testing.com'
-secret/ocirsecret created
+kubectl create secret docker-registry ocirsecret -n wls-k8s-domain-ns --docker-server=phx.ocir.io --docker-username='axrtkaqgdfo8/oracleidentitycloudservice/john.p.smith@testing.com' --docker-password='xxxxxxxxxx' --docker-email='john.p.smith@testing.com'
 ```
 Now for WebLogic Domain log, it will requires its mounted directory to be in full permission mode (777) to do that we need to mount the /shared/logs to the bastion and create root folder and give 777 permission:
 ```
@@ -170,15 +166,16 @@ Set the following values:
 |namespace:|wls-k8s-domain-ns||
 |weblogic.domainUID:|wls-k8s-domain||
 |domainHome:|/u01/oracle/user_projects/domains/wls-k8s-domain||
-|image:|YOUR_OCI_REGION_CODE.ocir.io/YOUR_TENANCY_NAME/weblogic-operator-tutorial:latest|"fra.ocir.io/johnpsmith/weblogic-operator-tutorial:latest"|
+|image:|YOUR_OCI_REGION_CODE.ocir.io/YOUR_TENANCY_NAME/weblogic-operator-tutorial:latest|"phx.ocir.io/johnpsmith/weblogic-modernization:latest"|
 |imagePullPolicy:|"Always"||
 |imagePullSecrets: <br>- name:|imagePullSecrets: <br>- name: ocirsecret||
 |webLogicCredentialsSecret: <br>&nbsp;name:|webLogicCredentialsSecret: <br>&nbsp;name: wls-k8s-domain-weblogic-credentials||
 |imagePullPolicy:|"Always"||
 |logHomeEnabled:|true||
 |logHome:|/shared/logs/wls-k8s-domain||
-|volume:|claimName: wls-k8s-domain-pvc||
-|volumeMounts:|mountPath: /shared/logs||
+|volume:<br>- name:<br>- persistentVolumeClaim:<br>    claimName:|volume:<br>- name: weblogic-domain-storage-volume<br>- persistentVolumeClaim:<br>    claimName: wls-k8s-domain-pvc||
+|volumeMounts:<br>- mountPath:<br>- name:|volumeMounts:<br>- mountPath: /shared/logs<br>- name: weblogic-domain-storage-volume||
+|annotations:<br>- prometheus.io/scrape: |annotations:<br>- prometheus.io/scrape: false||
 
 Your `domainKube.yaml` should be almost the same what is [available in the imported tutorial repository (click the link if you want to compare and check)](https://github.com/tazlambert/weblogic-operator-tutorial/blob/master/domainKube.yaml).
 
