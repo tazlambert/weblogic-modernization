@@ -1,6 +1,4 @@
-# Oracle WebLogic Operator Tutorial #
-
-### Assigning WebLogic Pods to Nodes ###
+# Assigning WebLogic Pods to Nodes #
 
 When you create a Managed server (Pod), the Kubernetes scheduler selects a node for the Pod to run on. The scheduler ensures that, for each resource type, the sum of the resource requests of the scheduled Containers is less than the capacity of the node. Note that although actual memory or CPU resource usage on nodes is very low, the scheduler still refuses to place a Pod on a node if the capacity check fails.
 
