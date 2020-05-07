@@ -124,15 +124,13 @@ To identify *tenancy OCID* in the Console, open the navigation menu. Under *Gove
 
 ![alt text](images/oke/011.tenancy.ocid.png)
 
-Leave the console open during CLI configuration and copy the required information from the console page or from text editor where you collected the OCIDs (user and tenancy). When you want to accept the default value what is offered in square bracket just hit Enter.
-
----
-
+Leave the console open during CLI configuration and copy the required information from the console page or from text editor where you collected the OCIDs (user and tenancy). When you want to accept the default value what is offered in square bracket just hit Enter. Now we need to install OCI CLI, by doing this:
+```
+bash -c "$(curl -L https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh)"
+```
 Note: If you need to install OCI CLI then follow the [documentation](https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/cliinstall.htm).
 
----
-
-Execute oci setup config command to setup the CLI:
+By default all the OCI CLI installation result will be placed in OS user home directory. Execute oci setup config command to setup the CLI:
 
 	$ oci setup config
 	    This command provides a walkthrough of creating a valid CLI config file.
@@ -190,11 +188,14 @@ The key is uploaded and its fingerprint is displayed in the list.
 
 ##### Configure kubectl #####
 
----
-
+Now we need to install kubectl in the bastion pc, which can be done by:
+```
+cd
+cd bin
+curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+chmod 755 kubectl
+```
 Note: If you need to install `kubectl` then follow the [documentation](https://kubernetes.io/docs/tasks/tools/install-kubectl/).
-
----
 
 The CLI setup now is done. To complete the `kubectl` configuration open the navigation menu and under **Developer Services**, click **Clusters**. Select your cluster and click to get the detail page.
 
