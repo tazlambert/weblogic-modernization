@@ -102,9 +102,9 @@ The repository already contains a necessary `wercker.yml` but before the executi
 | Key | Value | Note |
 |----------------|---------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | OCI_REGISTRY_USERNAME | your_cloud_username |  The username what you note during user settings. e.g. oracleidentitycloudservice/john.p.smith@example.com |
-| OCI_REGISTRY_PASSWORD | OCIR Auth Token | The Auth Token you generated previously |
-| TENANCY | Name of your registry | To store and retrieve image from OCIR |
-| REGION | The code of your home region. See the [documentation](https://docs.cloud.oracle.com/iaas/Content/Registry/Concepts/registryprerequisites.htm#Availab) to get your region code. | e.g. `fra` - stands for *eu-frankfurt-1* |
+| OCI_REGISTRY_PASSWORD | OCIR Auth Token | The Auth Token you generated [previously](https://github.com/tazlambert/weblogic-modernization/blob/master/tutorials/create.domain.docker.image.md#prepare-ocir-access-from-bastion) |
+| TENANCY | Name of your registry | To store and retrieve image from OCIR that was [generated](https://github.com/tazlambert/weblogic-modernization/blob/master/tutorials/create.domain.docker.image.md#prepare-ocir-access-from-bastion) |
+| REGION | The code of your home region. See the [documentation](https://docs.cloud.oracle.com/iaas/Content/Registry/Concepts/registryprerequisites.htm#Availab) to get your region code. | That was generated [previously](https://github.com/tazlambert/weblogic-modernization/blob/master/tutorials/create.domain.docker.image.md#prepare-ocir-access-from-bastion) |
 | DOCKER_USERNAME | Your Docker Hub username | Necessary to pull official WebLogic Server image from Docker Store |
 | DOCKER_PASSWORD | Your Docker Hub password | Necessary to pull official WebLogic Server image from Docker Store |
 | KUBERNETES_MASTER | Your OKE Public IP:Port | Necessary to push modified WebLogic Server image from Image Store (OCIR) |
