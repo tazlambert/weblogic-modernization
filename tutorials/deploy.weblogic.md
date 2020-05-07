@@ -181,17 +181,12 @@ Your `domainKube.yaml` should be almost the same what is [available in the impor
 
 Upload domainKube.yaml to your Github repository and place it in the root directory:
 
-![](images/deploy.domain/001.uploadDomainKube.yaml.png)
-![](images/deploy.domain/002.locationDomainKube.yaml.png)
+![](images/deploy.domain/uploadDomainKube.yaml.png)
 
-Open the Wercker consol and go to the **Runs** tab and click ***trigger a build now*** link.
-
-![alt text](images/build.weblogic.pipeline/014.run.build.png)
-
-To get more details about the current step click on the pipeline.
-
-![alt text](images/build.weblogic.pipeline/015.running.png)
-
+To deploy for the first time it can be invoked using this command in bastion:
+```
+kubectl apply -f domainKube.yaml
+```
 Check the introspector job which needs to be run first:
 ```
 $ kubectl get pod -n wls-k8s-domain-ns
