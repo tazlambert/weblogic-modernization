@@ -1,7 +1,5 @@
 
-# Oracle WebLogic Operator Tutorial #
-
-### Ingress Controller and Load Balancer using Nginx  ###
+# Deploy Ingress Load Balancer for WebLogic in Kubernetes #
 
 The Oracle WebLogic Server Kubernetes Operator supports Oracle Cloud Infrastructure Load Balancer, the sample can be seen from the [documentation](https://docs.cloud.oracle.com/en-us/iaas/Content/ContEng/Tasks/contengsettingupingresscontroller.htm). It is recommended for Production purpose to use this configuration. This tutorial demonstrates how to configure Kubernetes to provisions Ingress Controller and Load Balancer.
 
