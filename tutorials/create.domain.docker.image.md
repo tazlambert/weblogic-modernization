@@ -38,7 +38,7 @@ Before we can store docker image to OCIR we need to get our Oracle Container Reg
     ![alt text](images/ocir/004.open.ocir.png)
     ![alt text](images/ocir/005.create.repo.png)
 
-    In this case we need to keep value "axrtkaqgdfo8" as part for the login, which will make the username to access OCIR is axrtkaqgdfo8/oracleidentitycloudservice/john.p.smith@testing.com
+    In this case we need to keep value "axrtkaqgdfo8" as part for the login, and it is called as TENANCY for this hands on labs, which will make the username to access OCIR is axrtkaqgdfo8/oracleidentitycloudservice/john.p.smith@testing.com
     
 3.  OCIR Server Address
     To get OCIR Server address, we must know the tenancy region location of the OCIR and OKE, which can be located on the top right of console then it will need to be combined in format <region-key>.ocir.io, the region-key mapping itself is located [here](https://docs.cloud.oracle.com/en-us/iaas/Content/Registry/Concepts/registryprerequisites.htm#Availab). Below, while creating repository that will be used during Hands on Lab, we can see that Region is US West (Phoenix), which makes the OCIR Server Address is phx.ocir.io
