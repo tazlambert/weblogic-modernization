@@ -12,24 +12,34 @@ For this Hands on Lab we are going to improve the existing Docker image of exist
 ### Update init Docker Image in bastion ###
 
 Check if bastion pc still get ini docker image;
+```  
+docker image ls
 ```
-[opc@bastion1 update]$ docker image ls
+The expected result will be:
+```
 REPOSITORY                                  TAG                 IMAGE ID            CREATED             SIZE
-phx.ocir.io/axrtkaqgdfo8/wls-move-improve   init                a91e54a367c3        2 days ago          1.46GB
+phx.ocir.io/axrtkaqgdfo8/wls-modernization  init                a91e54a367c3        2 days ago          1.46GB
 oraclelinux                                 7-slim              f23503228fa1        3 weeks ago         120MB
 ```
 Otherwise, do a docker pull image from OCIR, just make sure we already logged in:
 ```
 docker login phx.ocir.io -u axseivdauftz/oracleidentitycloudservice/john.p.smith@testing.com
-docker pull phx.ocir.io/axseivdauftz/wls-move-improve:init
+docker pull phx.ocir.io/axseivdauftz/wls-modernization:init
 ```
 After checking the availability of the init Docker image then we need to download the binary and configurationg files, and we need to put those files inside one directory;
 ```
 cd
 mkdir update
-cd update
 ```
+Several files for WebLogic Domain WDT archive and model need to be uploaded to /home/opc/upload directory:
+```
+-rw-rw-r--   1 opc opc    3353 May  1 08:48 updateDomain.yaml
+-rw-rw-r--   1 opc opc   87761 May  3 08:56 updateDomain.zip
+```
+#### Preparing WebLogic Monitoring Exporter ####
+
 ![alt text](images/wme/wme.png)
+
 Create WebLogic Monitoring Exporter config file from [template](https://github.com/oracle/weblogic-monitoring-exporter/blob/master/samples/kubernetes/end2end/dashboard/exporter-config.yaml) Download the binary file for WebLogic Monitoring Exporter:
 ```
 curl -L -O https://github.com/oracle/weblogic-monitoring-exporter/releases/download/v1.1.2/wls-exporter.war
@@ -96,7 +106,32 @@ queries:
     prefix: wls_jta_
     key: name
 ```
+So here are several files for WebLogic Monitoring Exporter in /home/opc/upload directory:
+```
+-rw-rw-r--   1 opc opc    1586 May  3 05:30 exporter-config.yaml
+-rw-rw-r--   1 opc opc    3353 May  1 08:48 updateDomain.yaml
+-rw-rw-r--   1 opc opc   87761 May  3 08:56 updateDomain.zip
+-rw-rw-r--   1 opc opc 2066715 May  3 05:29 wls-exporter.war
+```
+Update the archive with config file:
+```
+mv exporter-config.yaml config.yml
+zip -u wls-exporter.war config.yml
+mkdir -p wlsdeploy/applications/
+cp wls-exporter.war wlsdeploy/applications/
+zip -u updateDomain.zip wlsdeploy/applications/wls-exporter.war
+```
+The new list of files in /home/opc/upload directory after update:
+```
+-rw-rw-r--   1 opc opc    1586 May  3 05:30 exporter-config.yaml
+-rw-rw-r--   1 opc opc    3353 May  1 08:48 updateDomain.yaml
+-rw-rw-r--   1 opc opc 2154228 May  3 08:59 updateDomain.zip
+-rw-rw-r--   1 opc opc 2066715 May  3 05:29 wls-exporter.war
+```
+#### Preparing WebLogic Logging Exporter ####
+
 ![alt text](images/wle/wle.png)
+
 Create WebLogic Logging Exporter config file from [template](https://github.com/oracle/weblogic-logging-exporter/blob/master/samples/WebLogicLoggingExporter.yaml) Download the binary file for WebLogic Logging Exporter 
 ```
 curl -L -O https://github.com/oracle/weblogic-logging-exporter/releases/download/v1.0.0/weblogic-logging-exporter-1.0.0.jar
@@ -112,6 +147,20 @@ weblogicLoggingExporterEnabled: true
 weblogicLoggingExporterSeverity: Info
 weblogicLoggingExporterBulkSize: 1
 ```
+Beside that we need to create 1 file named setUserOverridesLate.sh that will be used to insert WebLogic Logging Exporter library that will be put into WebLogic Domain lib directory, into the domain classpath, the content will be:
+```
+export CLASSPATH="/u01/oracle/user_projects/domains/wls-k8s-domain/lib/weblogic-logging-exporter-1.0.0.jar:/u01/oracle/user_projects/domains/wls-k8s-domain/lib/
+snakeyaml-1.23.jar:$CLASSPATH"
+```
+Here are list of files for WebLogic Logging Exporter for /home/opc/upload directory:
+```
+-rwxr-xr-x   1 opc opc     191 May  3 09:24 setUserOverridesLate.sh
+-rw-rw-r--   1 opc opc  301298 May  3 05:29 snakeyaml-1.23.jar
+-rw-rw-r--   1 opc opc   19794 May  3 05:29 weblogic-logging-exporter-1.0.0.jar
+-rw-rw-r--   1 opc opc     207 May  3 08:07 WebLogicLoggingExporter.yaml
+```
+#### Preparing WebLogic Domain WDT ####
+
 Then we need to re-configured the [original WDT model](https://github.com/tazlambert/weblogic-move-improve/blob/master/tutorials/create.domain.artifact.md#original-wdt-model) file to include new application deployment and startup class:
 ```
 domainInfo:
@@ -208,44 +257,6 @@ appDeployments:
             ModuleType: war
             Target: 'admin-server,cluster-1'            
 ```
-Before starting the update of Docker image process we need to configure deployment for weblogic exporter:
-```
-[opc@bastion1 update]$ ls -al
-total 4460
-drwxrwxr-x   2 opc opc    4096 May  3 08:47 .
-drwx------. 30 opc opc    4096 May  3 07:37 ..
--rw-rw-r--   1 opc opc    1586 May  3 05:30 exporter-config.yaml
--rwxr-xr-x   1 opc opc     191 May  3 09:24 setUserOverridesLate.sh
--rw-rw-r--   1 opc opc  301298 May  3 05:29 snakeyaml-1.23.jar
--rw-rw-r--   1 opc opc    3353 May  1 08:48 updateDomain.yaml
--rw-rw-r--   1 opc opc   87761 May  3 08:56 updateDomain.zip
--rw-rw-r--   1 opc opc   19794 May  3 05:29 weblogic-logging-exporter-1.0.0.jar
--rw-rw-r--   1 opc opc     207 May  3 08:07 WebLogicLoggingExporter.yaml
--rw-rw-r--   1 opc opc 2066715 May  3 05:29 wls-exporter.war
-[opc@bastion1 update]$ mv exporter-config.yaml config.yml
-[opc@bastion1 update]$ ls
-config.yml  snakeyaml-1.23.jar  updateDomain.yaml  updateDomain.zip  weblogic-logging-exporter-1.0.0.jar  WebLogicLoggingExporter.yaml  wls-exporter.war
-[opc@bastion1 update]$ zip -u wls-exporter.war config.yml
-updating: config.yml
-        zip warning: Local Entry CRC does not match CD: config.yml
- (deflated 60%)
-[opc@bastion1 update]$ mkdir -p wlsdeploy/applications/
-[opc@bastion1 update]$ cp wls-exporter.war wlsdeploy/applications/
-[opc@bastion1 update]$ zip -u updateDomain.zip wlsdeploy/applications/wls-exporter.war
-  adding: wlsdeploy/applications/wls-exporter.war (deflated 0%)
-[opc@bastion1 update]$ ls -al
-total 4460
-drwxrwxr-x   2 opc opc    4096 May  3 09:00 .
-drwx------. 30 opc opc    4096 May  3 07:37 ..
--rw-rw-r--   1 opc opc    1586 May  3 05:30 config.yml
--rwxr-xr-x   1 opc opc     191 May  3 09:24 setUserOverridesLate.sh
--rw-rw-r--   1 opc opc  301298 May  3 05:29 snakeyaml-1.23.jar
--rw-rw-r--   1 opc opc    3353 May  1 08:48 updateDomain.yaml
--rw-rw-r--   1 opc opc 2154228 May  3 08:59 updateDomain.zip
--rw-rw-r--   1 opc opc   19794 May  3 05:29 weblogic-logging-exporter-1.0.0.jar
--rw-rw-r--   1 opc opc     207 May  3 08:07 WebLogicLoggingExporter.yaml
--rw-rw-r--   1 opc opc 2066988 May  3 08:51 wls-exporter.war
-```
 To update the Docker image we will require to have additional build [commands](https://github.com/oracle/weblogic-image-tool/blob/master/site/update-image.md#--additionalbuildcommands) and [files](https://github.com/oracle/weblogic-image-tool/blob/master/site/update-image.md#--additionalbuildfiles) that functioned to copy all the necessary files into the docker image:
 ```
 [before-wdt-command]
@@ -257,8 +268,6 @@ COPY --chown=oracle:oracle files/WebLogicLoggingExporter.yaml $DOMAIN_HOME/confi
 ```
 We can save it as addBuildCommand.docker, which will make the update directory structure like below:
 ```
-[opc@bastion1 update]$ ls -al
-total 4464
 drwxrwxr-x   2 opc opc    4096 May  3 09:11 .
 drwx------. 30 opc opc    4096 May  3 09:11 ..
 -rw-rw-r--   1 opc opc     342 May  3 09:11 addBuildCommand.docker
@@ -271,26 +280,32 @@ drwx------. 30 opc opc    4096 May  3 09:11 ..
 -rw-rw-r--   1 opc opc     207 May  3 08:07 WebLogicLoggingExporter.yaml
 -rw-rw-r--   1 opc opc 2066988 May  3 08:51 wls-exporter.war
 ```
-Finally we are going to use WebLogic Image Tool and Deploy Tool again:
+Then we need to check WebLogic Image Tool cache list using command:
 ```
-[opc@bastion1 update]$ ./imagetool.sh cache listItems
+./imagetool.sh cache listItems
+```
+The result suppose to be like below:
+```
 Cache contents
 cache.dir=/home/opc/cache
 wdt_1.7.3=/home/opc/mnt/weblogic-deploy.zip
 wls_12.2.1.4.0=/home/opc/mnt/fmw_12.2.1.4.0_wls.jar
 jdk_8u251=/home/opc/mnt/jdk-8u251-linux-x64.tar.gz
-[opc@bastion1 update]$  ./imagetool.sh update --tag phx.ocir.io/axrtkaqgdfo8/wls-move-improve:latest --fromImage phx.ocir.io/axrtkaqgdfo8/wls-move-improve:init --wdtDomainHome /u01/oracle/user_projects/domains/wls-k8s-domain --wdtOperation deploy --wdtArchive updateDomain.zip --wdtModel updateDomain.yaml --wdtVersion 1.7.3 --additionalBuildCommands addBuildCommand.docker --additionalBuildFiles snakeyaml-1.23.jar  --additionalBuildFiles weblogic-logging-exporter-1.0.0.jar --additionalBuildFiles setUserOverridesLate.sh --additionalBuildFiles WebLogicLoggingExporter.yaml
+```
+And this is the command that will be used to update the Docker image with WebLogic Monitoring Exporter and WebLogic Logging Exporter:
+```
+./imagetool.sh update --tag phx.ocir.io/axrtkaqgdfo8/wls-move-improve:latest --fromImage phx.ocir.io/axrtkaqgdfo8/wls-move-improve:init --wdtDomainHome /u01/oracle/user_projects/domains/wls-k8s-domain --wdtOperation deploy --wdtArchive updateDomain.zip --wdtModel updateDomain.yaml --wdtVersion 1.7.3 --additionalBuildCommands addBuildCommand.docker --additionalBuildFiles snakeyaml-1.23.jar  --additionalBuildFiles weblogic-logging-exporter-1.0.0.jar --additionalBuildFiles setUserOverridesLate.sh --additionalBuildFiles WebLogicLoggingExporter.yaml
 ```
 | Key | Value | Note |
 |----------------|---------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | imagetool.sh | update | Update Docker image |
-| tag | phx.ocir.io/axrtkaqgdfo8/wls-move-improve:latest | New Docker image tag |
-| fromImage | phx.ocir.io/axrtkaqgdfo8/wls-move-improve:init | Source Docker image tag |
+| tag | phx.ocir.io/axrtkaqgdfo8/wls-modernization:latest | New Docker image tag |
+| fromImage | phx.ocir.io/axrtkaqgdfo8/wls-modernization:init | Source Docker image tag |
 | wdtDomainHome | /u01/oracle/user_projects/domains/wls-k8s-domain | Existing WebLogic Domain home directory  |
 | wdtOperation | deploy | WebLogic Deploy Tool mode |
 | wdtArchive | updateDomain.zip | WebLogic Deploy Tool archive containing new application |
 | wdtModel | updateDomain.yaml | WebLogic Deploy Tool model containing new application startup class |
-| wdtVersion | 1.7.3 | WebLogic Deploy Tool version |
+| wdtVersion | 1.8.1 | WebLogic Deploy Tool version |
 | additionalBuildCommands | addBuildCommand.docker | WebLogic Deploy Tool additional command to update WebLogic Domain |
 | additionalBuildFiles | snakeyaml-1.23.jar | WebLogic Deploy Tool additional file for WebLogic Logging Exporter |
 | additionalBuildFiles | weblogic-logging-exporter-1.0.0.jar | WebLogic Deploy Tool additional file for WebLogic Logging Exporter |
