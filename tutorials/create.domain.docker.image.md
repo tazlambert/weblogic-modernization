@@ -85,7 +85,7 @@ export PATH=$JAVA_HOME/bin:$PATH
 ```
 Then after that 
 ```
-**_source .bashrc_**
+source .bashrc
 java -version
 ```
 The expected output is like below
@@ -95,17 +95,23 @@ Java HotSpot(TM) 64-Bit Server VM (build 25.251-b08, mixed mode)
 ```
 Most of the time, there is no out of the box docker capability, so we need to enable docker engine in the OS, otherwise we cannot login to OCIR repository. To do that you need to have sudo or root privileges, and do the following:
 ```
-[opc@bastion1 ~]$ sudo -i
-[opc@bastion1 ~]$ yum install -y yum-utils zip unzip
-[opc@bastion1 ~]$ yum-config-manager --enable ol7_optional_latest
-[opc@bastion1 ~]$ yum-config-manager --enable ol7_addons
-[opc@bastion1 ~]$ yum install -y oraclelinux-developer-release-el7
-[opc@bastion1 ~]$ yum-config-manager --enable ol7_developer
-[opc@bastion1 ~]$ yum install -y docker-engine
-[opc@bastion1 ~]$ systemctl enable docker
-[opc@bastion1 ~]$ chkconfig docker on
+sudo yum install -y yum-utils zip unzip
+sudo yum-config-manager --enable ol7_optional_latest
+sudo yum-config-manager --enable ol7_addons
+sudo yum install -y oraclelinux-developer-release-el7
+sudo yum-config-manager --enable ol7_developer
+sudo yum install -y docker-engine
+sudo systemctl enable docker
+sudo chkconfig docker on
 ```
 Above commands will enable docker engine capability in bastion and auto start docker engine after reboot. Beside this, we need to check also the firewall and SELinux in the bastion OS, make sure it open the required ports.
+```
+sudo sed -i 's/^SELINUX=enforcing/SELINUX=disabled/' /etc/selinux/config
+sudo /usr/sbin/setenforce 0
+sudo systemctl stop firewalld
+sudo systemctl disable firewalld
+sudo reboot
+```
 
 #### Prepare WebLogic, Java SDK, and Domain Artifact in bastion ####
 First we create one folder to keep the binaries and artifact:
@@ -115,22 +121,19 @@ First we create one folder to keep the binaries and artifact:
 Then download all these and upload it along with artifacts (wls-k8s-domain.zip and wls-k8s-domain.yaml):
 - [Java SDK 8u251](https://www.oracle.com/java/technologies/javase-jdk8-downloads.html)
 - [WebLogic Server 12.2.1.4](https://www.oracle.com/middleware/technologies/weblogic-server-installers-downloads.html)
-- [WebLogic Imaging Tool 1.8.4](https://github.com/oracle/weblogic-image-tool/releases/download/release-1.8.4/imagetool.zip)
-- [WebLogic Deployment Tool 1.7.3](https://github.com/oracle/weblogic-deploy-tooling/releases/download/weblogic-deploy-tooling-1.7.3/weblogic-deploy.zip)
+- [WebLogic Imaging Tool 1.8.5](https://github.com/oracle/weblogic-image-tool/releases/download/release-1.8.5/imagetool.zip)
+- [WebLogic Deployment Tool 1.8.1](https://github.com/oracle/weblogic-deploy-tooling/releases/download/weblogic-deploy-tooling-1.8.1/weblogic-deploy.zip)
 
 #### Create Docker Image from existing domain artifacts in bastion ####
 ```
-[opc@bastion1 ~]$ cd /home/opc/mnt
-[opc@bastion1 ~]$ unzip imagetool.zip
-[opc@bastion1 ~]$ cd imagetool/bin
-[opc@bastion1 ~]$ chmod 755 *
-[opc@bastion1 bin]$ ./imagetool.sh cache addInstaller --type jdk --version 8u251 --path /home/opc/mnt/jdk-8u251-linux-x64.tar.gz
-[INFO   ] Successfully added to cache. jdk_8u251=/home/opc/mnt/jdk-8u251-linux-x64.tar.gz
-[opc@bastion1 bin]$ ./imagetool.sh cache addInstaller --type wls --version 12.2.1.4.0 --path /home/opc/mnt/fmw_12.2.1.4.0_wls.jar
-[INFO   ] Successfully added to cache. wls_12.2.1.4.0=/home/opc/mnt/fmw_12.2.1.4.0_wls.jar
-[opc@bastion1 bin]$ ./imagetool.sh cache addInstaller --type wdt --version 1.7.3 --path /home/opc/mnt/weblogic-deploy.zip
-[INFO   ] Successfully added to cache. wdt_1.7.3=/home/opc/mnt/weblogic-deploy.zip
-[opc@bastion1 bin]$ ./imagetool.sh create --jdkVersion 8u251 --version 12.2.1.4.0 --user john.p.smith@testing.com --password password2020 --wdtModel /home/opc/mnt/wls-k8s-domain.yaml --wdtArchive /home/opc/mnt/wls-k8s-domain.zip --wdtVersion 1.7.3 --wdtDomainHome /u01/oracle/user_projects/domains/wls-k8s-domain --tag phx.ocir.io/axrtkaqgdfo8/wls-move-improve:init --latestPSU
+cd /home/opc/mnt
+unzip imagetool.zip
+cd imagetool/bin
+chmod 755 *
+./imagetool.sh cache addInstaller --type jdk --version 8u251 --path /home/opc/mnt/jdk-8u251-linux-x64.tar.gz
+./imagetool.sh cache addInstaller --type wls --version 12.2.1.4.0 --path /home/opc/mnt/fmw_12.2.1.4.0_wls.jar
+./imagetool.sh cache addInstaller --type wdt --version 1.8.1 --path /home/opc/mnt/weblogic-deploy.zip
+./imagetool.sh create --jdkVersion 8u251 --version 12.2.1.4.0 --user john.p.smith@testing.com --password password2020 --wdtModel /home/opc/mnt/wls-k8s-domain.yaml --wdtArchive /home/opc/mnt/wls-k8s-domain.zip --wdtVersion 1.8.1 --wdtDomainHome /u01/oracle/user_projects/domains/wls-k8s-domain --tag phx.ocir.io/axrtkaqgdfo8/wls-modernization:init --latestPSU
 ```
 | Key | Value | Note |
 |----------------|---------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -140,14 +143,13 @@ Then download all these and upload it along with artifacts (wls-k8s-domain.zip a
 | password | password2020 | Oracle support password |
 | wdtModel | /home/opc/mnt/wls-k8s-domain.yaml | location of existing WebLogic domain model |
 | wdtArchive | /home/opc/mnt/wls-k8s-domain.zip | location of existing WebLogic domain archive |
-| wdtVersion | 1.7.3 | make sure same with addInstaller value |
+| wdtVersion | 1.8.1 | make sure same with addInstaller value |
 | wdtDomainHome | /u01/oracle/user_projects/domains/wls-k8s-domain | The desired WebLogic domain home in docker image |
-| tag | phx.ocir.io/axrtkaqgdfo8/wls-move-improve:init | Reflects where will the docker image will be stored in OCIR |
+| tag | phx.ocir.io/axrtkaqgdfo8/wls-modernization:init | Reflects where will the docker image will be stored in OCIR |
 | latestPSU | flag only | Flag to make sure docker image will also update WebLogic binary with latest patches |
 
 Below is the expected result for a success docker image creation process:
 ```
-[opc@bastion1 bin]$ ./imagetool.sh create --jdkVersion 8u251 --version 12.2.1.4.0 --user lambertus.wardana@oracle.com --password Orcl@mar2020 --wdtModel /home/opc/mnt/wls-k8s-domain.yaml --wdtArchive /home/opc/mnt/wls-k8s-domain.zip --wdtVersion 1.7.3 --wdtDomainHome /u01/oracle/user_projects/domains/wls-k8s-domain --tag phx.ocir.io/axrtkaqgdfo8/wls-move-improve:init --latestPSU
 [INFO   ] Image Tool build ID: cafbdcea-4c4d-4307-b7b3-3cd285f0d49c
 [INFO   ] Temporary directory used for docker build context: /home/opc/wlsimgbuilder_temp1721686485613246597
 [INFO   ] copying /home/opc/mnt/jdk-8u251-linux-x64.tar.gz to build context folder.
@@ -838,7 +840,7 @@ Welcome to WebLogic Server Administration Scripting Shell
 
 Type help() for help on available commands
 
-####<Apr 30, 2020 8:27:00 AM> <INFO> <WebLogicDeployToolingVersion> <logVersionInfo> <WLSDPLY-01750> <The WebLogic Deploy Tooling createDomain version is 1.7.3:master.4f1ebfc:Apr 03, 2020 18:05 UTC>
+####<Apr 30, 2020 8:27:00 AM> <INFO> <WebLogicDeployToolingVersion> <logVersionInfo> <WLSDPLY-01750> <The WebLogic Deploy Tooling createDomain version is 1.8.1:master.4f1ebfc:Apr 03, 2020 18:05 UTC>
 ####<Apr 30, 2020 8:27:02 AM> <INFO> <Validator> <__validate_model_file> <WLSDPLY-05002> <Performing validation in TOOL mode for WebLogic Server version 12.2.1.4.0 and WLST OFFLINE mode>
 ####<Apr 30, 2020 8:27:02 AM> <INFO> <Validator> <__validate_model_file> <WLSDPLY-05003> <Performing model validation on the /u01/wdt/models/wls-k8s-domain.yaml model file>
 ####<Apr 30, 2020 8:27:02 AM> <INFO> <Validator> <__validate_model_file> <WLSDPLY-05005> <Performing archive validation on the /u01/wdt/models/wls-k8s-domain.zip archive file>
@@ -890,7 +892,7 @@ Type help() for help on available commands
 ####<Apr 30, 2020 8:28:11 AM> <INFO> <DatasourceDeployer> <_add_named_elements> <WLSDPLY-09606> <Adding Properties user to JDBCDriverParams>
 ####<Apr 30, 2020 8:28:11 AM> <INFO> <ApplicationDeployer> <__add_applications> <WLSDPLY-09301> <Adding Application testwebapp to Domain wls-k8s-domain>
 
-Issue Log for createDomain version 1.7.3 running WebLogic version 12.2.1.4.0 offline mode:
+Issue Log for createDomain version 1.8.1 running WebLogic version 12.2.1.4.0 offline mode:
 
 Total:       WARNING :     0    SEVERE :     0
 
@@ -954,8 +956,8 @@ oraclelinux                                 7-slim              f23503228fa1    
 From here now we need to push the docker image into OCIR, make sure we already do login to OCIR
 ```
 [opc@bastion1 bin]$ docker login phx.ocir.io -u axrtkaqgdfo8/oracleidentitycloudservice/john.p.smith@testing.com
-[opc@bastion1 bin]$ docker push phx.ocir.io/axrtkaqgdfo8/wls-move-improve:init
-The push refers to repository [phx.ocir.io/axrtkaqgdfo8/wls-move-improve]
+[opc@bastion1 bin]$ docker push phx.ocir.io/axrtkaqgdfo8/wls-modernization:init
+The push refers to repository [phx.ocir.io/axrtkaqgdfo8/wls-modernization]
 dc8025fc2f61: Pushed
 03ff6772cb7d: Pushing [=>                                                 ]  19.22MB/918.3MB
 c613bc186298: Pushing [=>                                                 ]  13.65MB/405.8MB
@@ -965,8 +967,8 @@ bc198e3a2f79: Pushing [===>                                               ]  7.5
 ```
 Wait until done
 ```
-[opc@bastion1 bin]$ docker push phx.ocir.io/axrtkaqgdfo8/wls-move-improve:init
-The push refers to repository [phx.ocir.io/axrtkaqgdfo8/wls-move-improve]
+[opc@bastion1 bin]$ docker push phx.ocir.io/axrtkaqgdfo8/wls-modernization:init
+The push refers to repository [phx.ocir.io/axrtkaqgdfo8/wls-modernization]
 dc8025fc2f61: Pushed
 03ff6772cb7d: Pushed
 c613bc186298: Pushed
