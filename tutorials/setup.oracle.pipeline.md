@@ -1,10 +1,10 @@
 # Setup Oracle Container Pipelines (Wercker) to Enable CI/CD for WebLogic Application #
 
-**Oracle Container Pipelines (Wercker)** is a Docker-Native CI/CD  Automation platform for Kubernetes & Microservice Deployments. Wercker is integrated with Docker containers, which package up application code and can be easily moved from server to server. Each build artifact can be a Docker container. The user can take the container from the Docker Hub or his private registry and build the code before shipping it. Its SaaS platform enables developers to test and deploy code often. They can push software updates incrementally as they are ready, rather than in bundled dumps. It makes it easier for coders to practice continuous integration, a software engineering practice in which each change a developer makes to the codebase is constantly tested in the process so that software doesn’t break when it goes live.
+**Oracle Container Pipelines (Wercker)** is a Docker-Native CI/CD  Automation platform for Kubernetes & Microservice Deployments. Wercker is integrated with Docker containers, which package up application code and can be easily moved from server to server. Each build artifact can be a Docker container. The user can take the container from the Docker Hub or his private registry and build the code before shipping it. Its SaaS platform enables developers to test and deploy code often. They can push software updates incrementally as they are ready, rather than in bundled dumps. 
 
-Oracle Container Pipelines is based on the concept of pipelines, which are automated workflows. Pipelines take pieces of code and automatically execute a series of steps upon that code.
+Oracle Container Pipelines makes it easier for coders to practice continuous integration, a software engineering practice in which each change a developer makes to the codebase is constantly tested in the process so that software doesn’t break when it goes live. Oracle Container Pipelines is based on the concept of pipelines, which are automated workflows. Pipelines take pieces of code and automatically execute a series of steps upon that code.
 
-This tutorial demonstrates how to create Oracle Container Pipelines application (CI/CD) to build/update custom WebLogic container image using customized Docker image or official WebLogic image from Docker Store as base source.
+This hands on labs demonstrates how to create Oracle Container Pipelines application (CI/CD) to update custom WebLogic container image using customized Docker image or build official WebLogic image from Docker Store as base source.
 
 The custom WebLogic Domain has the following components configured/deployed:
 
@@ -24,32 +24,6 @@ The key components of Oracle Container Pipelines:
 - [Docker](https://hub.docker.com/) account.
 - [Github ](sign.up.github.md) account.
 - [Oracle Container Pipeline](sign.up.wercker.md)
-
----
-
-#### Prepare Oracle Container Registry access ####
-
-Before you create your build pipeline you need to get your Oracle Container Registry token. Token acts as password to container registry provided by Oracle Cloud Infrastructure.
-
-Open your OCI (Oracle Cloud Infrastructure) Console. If necessary Sign in again using your Cloud Services link you got in email during the registration process. Remember on the dashboard you need to click the menu icon at the top left corner and select **Compute** on the left sliding menu.
-
-![alt text](images/oke/003.compute.console.png)
-
-Using the OCI console page click the user icon and select **User Settings**. On the left area of the User details page select the **Auth Tokens** item. Click the **Generate Token** to get a new token.
-
-![alt text](images/ocir/001.user.settings.auth.token.png)
-
-Enter a description which allows you to easily identify the allocated token later. For example if you want to revoke then you have to find the proper token to delete. For example *ocir*.
-
-![alt text](images/ocir/002.generate.token.png)
-
-Now **copy and store(!)** your generated token for later usage. Click **Close**.
-
-![alt text](images/ocir/003.copy.token.png)
-
-Since you are on the User details page please note the proper user name for later usage. You need to use this user name in order to login to OCI Registry for push and pull images.
-
-![alt text](images/build.weblogic.pipeline/000.username.png)
 
 #### Accept Licence Agreement to use `store/oracle/weblogic:12.2.1.4` image from Docker Store ####
 
@@ -75,11 +49,11 @@ Now you are ready to pull the  image on Docker enabled host after authenticating
 
 ![alt text](images/docker/05.docker.store.weblogic.png)
 
-#### Import WebLogic Operator Tutorial's source repository into your Github repository ####
+#### Import WebLogic Modernization's source repository into your Github repository ####
 
 In this step you will fork the tutorial's source repository. The source repository contains the demo application deployed on top of WebLogic server, configuration yaml to quickly create Oracle Container Pipelines(CI/CD) application to build custom WebLogic image and few additional Kubernetes configuration files to deploy the custom WebLogic image.
 
-Open the *https://github.com/tazlambert/weblogic-operator-tutorial.git* repository in your browser. Click the **Fork** button at the left top area. Sign in to github.com if necessary.
+Open the *https://github.com/tazlambert/weblogic-modernization.git* repository in your browser. Click the **Fork** button at the left top area. Sign in to github.com if necessary.
 
 ![alt text](images/build.weblogic.pipeline/001.fork.repository.png)
 
@@ -111,7 +85,7 @@ Select the owner of the application. By default it is your Oracle Container Pipe
 
 ![alt text](images/build.weblogic.pipeline/004.application.user.repo.png)
 
-Select *weblogic-operator-tutorial* repository what you imported previously. Click **Next**.
+Select *weblogic-mdoernization* repository what you imported previously. Click **Next**.
 
 ![alt text](images/build.weblogic.pipeline/005.select.repository.png)
 
