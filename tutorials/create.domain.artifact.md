@@ -9,8 +9,11 @@ The motivation for the [Oracle WebLogic Server Deploy Tooling](https://github.co
 ### Prerequisites ###
 
 - Access to the existing WebLogic Domain OS
+- Access to the WebLogic Domain itself
 
 ### Create WebLogic Domain Artifact ###
+
+For the purpose of this labs please create WebLogic Domain with name wls-k8s-domain and deploy opsdemo.war from [this repository](https://github.com/tazlambert/weblogic-modernization/blob/master/opdemo.war)
 
 Login the to WebLogic Domain OS using appropriate user and locate the domain directory
 
