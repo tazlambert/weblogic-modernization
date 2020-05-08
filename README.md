@@ -1,4 +1,4 @@
-# Welcome to Oracle WebLogic Move and Improve Hands On Lab #
+# Welcome to Oracle WebLogic Modernization Hands On Lab #
 
 ## About this hands-on Hands On Lab ##
 
