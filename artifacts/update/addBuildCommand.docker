@@ -1,0 +1,6 @@
+[before-wdt-command]
+USER root
+COPY --chown=oracle:oracle files/snakeyaml-1.23.jar $DOMAIN_HOME/lib
+COPY --chown=oracle:oracle files/weblogic-logging-exporter-1.0.0.jar $DOMAIN_HOME/lib
+COPY --chown=oracle:oracle files/setUserOverridesLate.sh $DOMAIN_HOME/bin
+COPY --chown=oracle:oracle files/WebLogicLoggingExporter.yaml $DOMAIN_HOME/config

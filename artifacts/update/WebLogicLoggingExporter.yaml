@@ -1,0 +1,7 @@
+weblogicLoggingIndexName: wls
+publishHost: elasticsearch.default.svc.cluster.local
+publishPort: 9200
+domainUID: wls-k8s-domain
+weblogicLoggingExporterEnabled: true
+weblogicLoggingExporterSeverity: Info
+weblogicLoggingExporterBulkSize: 1
