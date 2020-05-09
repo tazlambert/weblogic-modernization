@@ -264,64 +264,16 @@ The most important part for Prometheus configuration is in extraScrapeConfigs, s
 
 After checking we can proceed with the installation process:
 ```
-[opc@bastion1 prometheus]$ helm install --wait --name prometheus --namespace monitoring --values prometheus/values.yaml stable/prometheus
-NAME:   prometheus
-LAST DEPLOYED: Mon May  4 05:02:35 2020
+helm install --wait prometheus --namespace monitoring --values prometheus/values.yaml stable/prometheus
+```
+The expected result will be:
+```
+NAME: prometheus
+LAST DEPLOYED: Sat May  9 10:16:34 2020
 NAMESPACE: monitoring
-STATUS: DEPLOYED
-
-RESOURCES:
-==> v1/ConfigMap
-NAME                     DATA  AGE
-prometheus-alertmanager  1     47s
-prometheus-server        5     47s
-
-==> v1/DaemonSet
-NAME                      DESIRED  CURRENT  READY  UP-TO-DATE  AVAILABLE  NODE SELECTOR  AGE
-prometheus-node-exporter  3        3        3      3           3          <none>         47s
-
-==> v1/Deployment
-NAME                           READY  UP-TO-DATE  AVAILABLE  AGE
-prometheus-alertmanager        1/1    1           1          47s
-prometheus-kube-state-metrics  1/1    1           1          47s
-prometheus-server              1/1    1           1          47s
-
-==> v1/Pod(related)
-NAME                                            READY  STATUS   RESTARTS  AGE
-prometheus-alertmanager-6d95b65944-nqgs9        2/2    Running  0         47s
-prometheus-kube-state-metrics-685dccc6d8-4xh2j  1/1    Running  0         47s
-prometheus-node-exporter-fs4bf                  1/1    Running  0         47s
-prometheus-node-exporter-mxxws                  1/1    Running  0         47s
-prometheus-node-exporter-twzkf                  1/1    Running  0         47s
-prometheus-server-6f549849db-6rjjf              2/2    Running  0         47s
-
-==> v1/Service
-NAME                           TYPE       CLUSTER-IP     EXTERNAL-IP  PORT(S)       AGE
-prometheus-alertmanager        NodePort   10.96.9.228    <none>       80:32000/TCP  47s
-prometheus-kube-state-metrics  ClusterIP  10.96.2.99     <none>       8080/TCP      47s
-prometheus-node-exporter       ClusterIP  None           <none>       9100/TCP      47s
-prometheus-server              NodePort   10.96.180.153  <none>       80:30000/TCP  47s
-
-==> v1/ServiceAccount
-NAME                           SECRETS  AGE
-prometheus-alertmanager        1        47s
-prometheus-kube-state-metrics  1        47s
-prometheus-node-exporter       1        47s
-prometheus-server              1        47s
-
-==> v1beta1/ClusterRole
-NAME                           AGE
-prometheus-alertmanager        47s
-prometheus-kube-state-metrics  47s
-prometheus-server              47s
-
-==> v1beta1/ClusterRoleBinding
-NAME                           AGE
-prometheus-alertmanager        47s
-prometheus-kube-state-metrics  47s
-prometheus-server              47s
-
-
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
 NOTES:
 The Prometheus server can be accessed via port 80 on the following DNS name from within your cluster:
 prometheus-server.monitoring.svc.cluster.local
@@ -349,7 +301,6 @@ Get the Alertmanager URL by running these commands in the same shell:
 #################################################################################
 
 
-
 For more information on running Prometheus, visit:
 https://prometheus.io/
 ```
@@ -362,7 +313,8 @@ prometheus-node-exporter-fs4bf             1/1     Running   0          3m17s
 prometheus-node-exporter-mxxws             1/1     Running   0          3m17s
 prometheus-node-exporter-twzkf             1/1     Running   0          3m17s
 prometheus-server-6f549849db-6rjjf         2/2     Running   0          3m17s
-
+```
+```
 [opc@bastion1 end2end]$ kubectl -n monitoring get svc -l app=prometheus
 NAME                       TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
 prometheus-alertmanager    NodePort    10.96.9.228     <none>        80:32000/TCP   3m31s
@@ -390,68 +342,16 @@ admin:
 ```
 Then we can start the execution:
 ```
-[opc@bastion1 end2end]$ kubectl --namespace monitoring create secret generic grafana-secret --from-literal=username=admin --from-literal=password=welcome1
-secret/grafana-secret created
-[opc@bastion1 end2end]$ helm install --wait --name grafana --namespace monitoring --values grafana/values.yaml stable/grafana
-NAME:   grafana
-E0506 09:04:39.208852   13466 portforward.go:372] error copying from remote stream to local connection: readfrom tcp4 127.0.0.1:34743->127.0.0.1:39822: write tcp4 127.0.0.1:34743->127.0.0.1:39822: write: broken pipe
-LAST DEPLOYED: Wed May  6 09:04:04 2020
+kubectl --namespace monitoring create secret generic grafana-secret --from-literal=username=admin --from-literal=password=welcome1
+helm install --wait grafana --namespace monitoring --values grafana/values.yaml stable/grafana
+```
+Expected result will be:
+```
+NAME: grafana
+LAST DEPLOYED: Sat May  9 10:22:00 2020
 NAMESPACE: monitoring
-STATUS: DEPLOYED
-
-RESOURCES:
-==> v1/ClusterRole
-NAME                 AGE
-grafana-clusterrole  35s
-
-==> v1/ClusterRoleBinding
-NAME                        AGE
-grafana-clusterrolebinding  35s
-
-==> v1/ConfigMap
-NAME          DATA  AGE
-grafana       1     35s
-grafana-test  1     35s
-
-==> v1/Deployment
-NAME     READY  UP-TO-DATE  AVAILABLE  AGE
-grafana  1/1    1           1          35s
-
-==> v1/Pod(related)
-NAME                     READY  STATUS   RESTARTS  AGE
-grafana-96c8dc8dc-vxstl  1/1    Running  0         35s
-
-==> v1/Role
-NAME          AGE
-grafana-test  35s
-
-==> v1/RoleBinding
-NAME          AGE
-grafana-test  35s
-
-==> v1/Service
-NAME     TYPE      CLUSTER-IP     EXTERNAL-IP  PORT(S)       AGE
-grafana  NodePort  10.96.114.123  <none>       80:31000/TCP  35s
-
-==> v1/ServiceAccount
-NAME          SECRETS  AGE
-grafana       1        35s
-grafana-test  1        35s
-
-==> v1beta1/PodSecurityPolicy
-NAME          PRIV   CAPS      SELINUX   RUNASUSER  FSGROUP   SUPGROUP  READONLYROOTFS  VOLUMES
-grafana       false  RunAsAny  RunAsAny  RunAsAny   RunAsAny  false     configMap,emptyDir,projected,secret,downwardAPI,persistentVolumeClaim
-grafana-test  false  RunAsAny  RunAsAny  RunAsAny   RunAsAny  false     configMap,downwardAPI,emptyDir,projected,secret
-
-==> v1beta1/Role
-NAME     AGE
-grafana  35s
-
-==> v1beta1/RoleBinding
-NAME     AGE
-grafana  35s
-
-
+STATUS: deployed
+REVISION: 1
 NOTES:
 1. Get your 'admin' user password by running:
 
@@ -478,7 +378,8 @@ prometheus-alertmanager         NodePort    10.96.222.140   <none>        80:320
 prometheus-kube-state-metrics   ClusterIP   10.96.53.190    <none>        8080/TCP       21m
 prometheus-node-exporter        ClusterIP   None            <none>        9100/TCP       21m
 prometheus-server               NodePort    10.96.20.253    <none>        80:30000/TCP   21m
-
+```
+```
 [opc@bastion1 end2end]$ kubectl get po -n monitoring -o wide
 NAME                                             READY   STATUS    RESTARTS   AGE   IP           NODE         NOMINATED NODE   READINESS GATES
 grafana-96c8dc8dc-vxstl                          1/1     Running   0          18m   10.244.1.7   10.0.10.12   <none>           <none>
@@ -506,7 +407,10 @@ This will be done by creating a datasource for Grafana, this will make Prometheu
 ```
 Make sure the URL point to the correct Node IP and Node Port of Prometheus Server, then to apply this we can use this command:
 ```
-opc@bastion1 end2end]$ curl -v -H 'Content-Type: application/json' -H "Content-Type: application/json" -X POST http://admin:welcome1@10.0.10.4:31000/api/datasources/ --data-binary @grafana/datasource.json
+curl -v -H 'Content-Type: application/json' -H "Content-Type: application/json" -X POST http://admin:welcome1@10.0.10.4:31000/api/datasources/ --data-binary @grafana/datasource.json
+```
+Expected result will be:
+```
 * About to connect() to 10.0.10.4 port 31000 (#0)
 *   Trying 10.0.10.4...
 * Connected to 10.0.10.4 (10.0.10.4) port 31000 (#0)
@@ -535,7 +439,10 @@ opc@bastion1 end2end]$ curl -v -H 'Content-Type: application/json' -H "Content-T
 ```
 After that we will configure the dashboard that already created to show WebLogic Metrics:
 ```
-[opc@bastion1 end2end]$ curl -v -H 'Content-Type: application/json' -H "Content-Type: application/json" -X POST http://admin:welcome1@10.0.10.4:31000/api/dashboards/db --data-binary @grafana/dashboard.json
+curl -v -H 'Content-Type: application/json' -H "Content-Type: application/json" -X POST http://admin:welcome1@10.0.10.4:31000/api/dashboards/db --data-binary @grafana/dashboard.json
+```
+Expected result will be:
+```
 * About to connect() to 10.0.10.4 port 31000 (#0)
 *   Trying 10.0.10.4...
 * Connected to 10.0.10.4 (10.0.10.4) port 31000 (#0)
