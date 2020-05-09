@@ -97,7 +97,7 @@ spec:
        - channelName: default
          nodePort: 30701
        # Uncomment to export the T3Channel as a service
-       #- channelName: T3Channel
+       - channelName: T3Channel
 #    serverPod:
 #      nodeSelector:
 #        wlservers1: true
