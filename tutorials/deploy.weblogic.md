@@ -215,6 +215,6 @@ While for Prometheus we can check from the dashboard that we can see the metrics
 
 And in the end all those metrics will displayed into Grafana like below:
 
-![alt text](images/deploy.domain/domainKibana.png)
+![alt text](images/deploy.domain/domainGrafana.png)
 
 While for the Admin Console and the test application itself it can be tested after ingress and load balancer configured
