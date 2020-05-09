@@ -1,0 +1,22 @@
+serviceAccount: "weblogic-operator-sa"
+dedicated: false
+domainNamespaces:
+  - "default"
+image: "oracle/weblogic-kubernetes-operator:2.5.0"
+imagePullPolicy: "IfNotPresent"
+remoteDebugNodePortEnabled: false
+suspendOnDebugStartup: false
+internalDebugHttpPort: 30999
+externalDebugHttpPort: 30999
+javaLoggingLevel: "INFO"
+# External REST Enabled
+externalRestEnabled: true 
+externalRestHttpsPort: 31001
+externalRestIdentitySecret: weblogic-operator-external-rest-identity
+# ELK Integration Part
+elkIntegrationEnabled: true
+logStashImage: "logstash:6.6.0"
+elasticSearchHost: "elasticsearch.default.svc.cluster.local"
+elasticSearchPort: 9200
+# Istio Experimental Part
+istioEnabled: false
