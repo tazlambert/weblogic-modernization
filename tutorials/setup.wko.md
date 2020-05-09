@@ -43,6 +43,38 @@ kubernetes      ClusterIP   10.96.0.1       <none>        443/TCP             6d
 ```
 From above results kibana can be accessed from 10.0.10.2:32172.
 
+### Create Self Signed Certificate for External REST Port ###
+
+First create operator's namespace in advance:
+
+    kubectl create namespace weblogic-operator-ns
+    
+This sample script generates a self-signed certificate and private key that can be used for the operator's external REST api when experimenting with the operator. They should not be used in a production environment.
+
+    $ kubernetes/samples/scripts/rest/generate-external-rest-identity.sh <SANs> -n <namespace> [-s <secret-name> ]
+
+Where <SANs> lists the subject alternative names to put into the generated self-signed certificate for the external WebLogic Operator REST HTTPS interface, should match the namespace where the operator will be installed, and optionally the secret name, which defaults to weblogic-operator-external-rest-identity. Each must be prefaced by DNS: (for a name) or IP: (for an address), for example:
+    
+    DNS:myhost,DNS:localhost,IP:127.0.0.1
+    
+You should include the addresses of all masters and load balancers in this list. To find OKE Master IP address click burger menu, click Developer Service, click Container Clusters (OKE), click your OKE cluster (cluster1)
+
+![](images/wko/wkoClusterIP.png)
+
+While the Load Balancer IP can be looked up by click burger menu, click Networking, click Load Balancers, pick the load balancer that use the same VCN as our OKE Cluster.
+
+![](images/wko/wkoLBIP.png)
+
+The certificate cannot be conveniently changed after installation of the operator. The script creates the secret in the weblogic-operator namespace with the self-signed certificate and private key.
+
+    ./generate-external-rest-identity.sh DNS:localhost,IP:127.0.0.1,IP:129.146.196.139,IP:147.154.103.105 -n weblogic-operator-ns > selfsignedcert.yaml
+
+The result of above script will be like this:
+
+    externalRestIdentitySecret: weblogic-operator-external-rest-identity
+
+Above value will be put inside the wkoValue.yaml
+
 ### Install the Operator with a Helm chart ###
 
 Before using helm install it using script https://helm.sh/docs/intro/install/ make sure to choose appropriate version, by sepcifying it in the command 
@@ -56,10 +88,6 @@ helm repo list
 helm repo update
 ```
 Kubernetes distinguishes between the concept of a user account and a service account for a number of reasons. The main reason is that user accounts are for humans while service accounts are for processes, which run in pods. WebLogic Operator also requires service accounts.  If service account not specified, it defaults to default (for example, the namespace's default service account). If you want to use a different service account, then you must create the operator's namespace and the service account before installing the operator Helm chart.
-
-Thus create operator's namespace in advance:
-
-    kubectl create namespace weblogic-operator-ns
 
 Create the service account:
 
@@ -83,17 +111,21 @@ domainNamespaces:
   - "default"
 image: "oracle/weblogic-kubernetes-operator:2.5.0"
 imagePullPolicy: "IfNotPresent"
-externalRestEnabled: false
-externalRestHttpsPort: 31001
 remoteDebugNodePortEnabled: false
 suspendOnDebugStartup: false
 internalDebugHttpPort: 30999
 externalDebugHttpPort: 30999
 javaLoggingLevel: "INFO"
+# External REST Enabled
+externalRestEnabled: true 
+externalRestHttpsPort: 31001
+externalRestIdentitySecret: weblogic-operator-external-rest-identity
+# ELK Integration Part
 elkIntegrationEnabled: true
 logStashImage: "logstash:6.6.0"
 elasticSearchHost: "elasticsearch.default.svc.cluster.local"
 elasticSearchPort: 9200
+# Istio Experimental Part
 istioEnabled: false
 ```
 For this lab we are going to use custom Value from above and save it as wkoValues.yaml and save it inside weblogic-kubernetes-operator directory.
@@ -123,7 +155,7 @@ TEST SUITE: None
 
 Check the operator pod, supposed there are 2 component inside; weblogic-operator and logstash:
 ```
-[opc@bastion1 weblogic-kubernetes-operator]$ kubectl get po -n sample-weblogic-operator-ns
+[opc@bastion1 weblogic-kubernetes-operator]$ kubectl get po -n weblogic-operator-ns
 NAME                                 READY   STATUS    RESTARTS   AGE
 weblogic-operator-5bb44c9bd4-9m7rr   2/2     Running   0          15m
 ```
