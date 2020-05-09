@@ -136,12 +136,16 @@ cd weblogic-kubernetes-operator/
 ```
 To update operator execute the following `helm upgrade` command:
 ```
-helm upgrade \
-  --reuse-values \
-  --set "domainNamespaces={wls-k8s-domain-ns}" \
-  --wait \
-  sample-weblogic-operator \
-  kubernetes/charts/weblogic-operator
+helm upgrade weblogic-operator -n weblogic-operator-ns --reuse-values --set "domainNamespaces={wls-k8s-domain-ns}" --wait kubernetes/charts/weblogic-operator
+```
+```
+Release "weblogic-operator" has been upgraded. Happy Helming!
+NAME: weblogic-operator
+LAST DEPLOYED: Sat May  9 14:04:51 2020
+NAMESPACE: weblogic-operator-ns
+STATUS: deployed
+REVISION: 2
+TEST SUITE: None
 ```
 Please note the only updated parameter in this case is the domain namespace.
 
