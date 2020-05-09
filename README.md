@@ -63,7 +63,7 @@ By the time this hands on lab created below are the tools that being used and it
 + **[Oracle Weblogic Kubernetes Operator (WKO) v2.5.0](https://github.com/oracle/weblogic-kubernetes-operator/releases/tag/v2.5.0)** 
 ### Others Tooling ###
 + **[Oracle Command Line Interface (OCI) v2.10.1](https://github.com/oracle/oci-cli/releases/tag/v2.10.1)**
-+ **[Kubectl v1.18.0](https://github.com/kubernetes/kubectl/releases/tag/kubernetes-1.18.0)**  
++ **[Kubectl v1.18.2](https://github.com/kubernetes/kubectl/releases/tag/kubernetes-1.18.2)**  
 + **[Helm v2.16.6](https://github.com/helm/helm/releases/tag/v2.16.6)** 
 + **[Kubernetes v1.15.7](https://docs.cloud.oracle.com/en-us/iaas/releasenotes/changes/37013251-39b2-4c08-8536-906d76bba789/)** 
 + **[Kube Prometheus v0.3.0](https://github.com/coreos/kube-prometheus/releases/tag/v0.3.0)** 
