@@ -159,9 +159,9 @@ TEST SUITE: None
 
 Check the operator pod, supposed there are 2 component inside; weblogic-operator and logstash:
 ```
-[opc@bastion1 weblogic-kubernetes-operator]$ kubectl get po -n weblogic-operator-ns
-NAME                                 READY   STATUS    RESTARTS   AGE
-weblogic-operator-5bb44c9bd4-9m7rr   2/2     Running   0          15m
+[opc@bastion1 ~]$ kubectl get po -n weblogic-operator-ns -o wide
+NAME                                 READY   STATUS    RESTARTS   AGE   IP            NODE         NOMINATED NODE   READINESS GATES
+weblogic-operator-86f7f9b77f-478l2   2/2     Running   0          48m   10.244.2.13   10.0.10.15   <none>           <none>
 ```
 From the service part we can see two services created, one is external for RET API and the other is for internal communication: 
 ```
