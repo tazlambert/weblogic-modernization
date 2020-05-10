@@ -48,7 +48,7 @@ This will demonstrate how to enable CI/CD process on the WebLogic domain, where 
 7. [Override JDBC Datasource parameters](tutorials/override.jdbc.md)
 8. [Update Web Application](tutorials/update.application.md)
 9. [Assigning WebLogic Pods to Nodes](tutorials/node.selector.md)
-10.[Assigning WebLogic Pods to Licensed Nodes](tutorials/node.selector.license.md)
+10. [Assigning WebLogic Pods to Licensed Nodes](tutorials/node.selector.license.md)
 
 ![](tutorials/images/readme2.png)
 
@@ -82,8 +82,8 @@ By the time this hands on lab created below are the tools that being used and it
 7. [Oracle Weblogic Server Kubernetes Operator Samples](https://github.com/oracle/weblogic-kubernetes-operator/tree/master/kubernetes/samples)
 8. [Oracle WebLogic Tutorial](https://github.com/nagypeter/weblogic-operator-tutorial)
 9. [End to end example of monitoring WebLogic Server in Kubernetes](https://blogs.oracle.com/weblogicserver/end-to-end-example-of-monitoring-weblogic-server-with-grafana-dashboards-on-the-oci-container-engine-for-kubernetes)
-<br>10.[Using Prometheus to Automatically Scale WebLogic Clusters on Kubernetes](https://blogs.oracle.com/weblogicserver/using-prometheus-to-automatically-scale-weblogic-clusters-on-kubernetes-v5)
-<br>11.[Scaling a WebLogic cluster](https://github.com/oracle/weblogic-kubernetes-operator/blob/master/site/v1.1/scaling.md) 
+10. [Using Prometheus to Automatically Scale WebLogic Clusters on Kubernetes](https://blogs.oracle.com/weblogicserver/using-prometheus-to-automatically-scale-weblogic-clusters-on-kubernetes-v5)
+11. [Scaling a WebLogic cluster](https://github.com/oracle/weblogic-kubernetes-operator/blob/master/site/v1.1/scaling.md) 
 
 ## License ##
 Copyright (c) 2020 Oracle and/or its affiliates
