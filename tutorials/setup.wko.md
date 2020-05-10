@@ -170,6 +170,128 @@ NAME                             TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(
 external-weblogic-operator-svc   NodePort    10.96.233.80    <none>        8081:31001/TCP   58s
 internal-weblogic-operator-svc   ClusterIP   10.96.218.169   <none>        8082/TCP         58s
 ```
+#### REST API Sample Usage ####
+
+By enabling external REST API we can control WebLogic Operator using command and do not need to make changes in the configuration file, several lists of the capability is in this [swagger documentation](https://oracle.github.io/weblogic-kubernetes-operator/swagger/index.html). Below we create a bash shell script that will enable access to operator using REST API:
+```
+#!/bin/bash
+KUBERNETES_SERVER=$1
+URL_TAIL=$2
+
+REST_PORT=`kubectl get services -n weblogic-operator-ns -o jsonpath='{.items[?(@.metadata.name == "external-weblogic-operator-svc")].spec.ports[?(@.name == "rest")].nodePort}'`
+REST_ADDR="https://${KUBERNETES_SERVER}:${REST_PORT}"
+SECRET=`kubectl get serviceaccount weblogic-operator-sa -n weblogic-operator-ns -o jsonpath='{.secrets[0].name}'`
+ENCODED_TOKEN=`kubectl get secret ${SECRET} -n weblogic-operator-ns -o jsonpath='{.data.token}'`
+TOKEN=`echo ${ENCODED_TOKEN} | base64 --decode`
+OPERATOR_CERT_DATA=`kubectl get secret -n weblogic-operator-ns weblogic-operator-external-rest-identity -o jsonpath='{.data.tls\.crt}'`
+OPERATOR_CERT_FILE="/tmp/operator.cert.pem"
+echo ${OPERATOR_CERT_DATA} | base64 --decode > ${OPERATOR_CERT_FILE}
+cat ${OPERATOR_CERT_FILE}
+
+echo "Ready to call operator REST APIs"
+
+STATUS_CODE=`curl \
+  -v \
+  --cacert ${OPERATOR_CERT_FILE} \
+  -H "Authorization: Bearer ${TOKEN}" \
+  -H Accept:application/json \
+  -X GET ${REST_ADDR}/${URL_TAIL} \
+  -o curl.out \
+  --stderr curl.err \
+  -w "%{http_code}"`
+
+cat curl.err
+cat curl.out | jq .
+```
+We can save this as restClient.sh and to run it we need to find out at which Nodes that being used and get its IP, in this case 10.0.10.15, below is the sample:
+```
+./restClient.sh 10.0.10.15 operator
+```
+Expected result will be:
+```
+-----BEGIN CERTIFICATE-----
+MIIDGDCCAgCgAwIBAgIEH6YWnzANBgkqhkiG9w0BAQsFADAcMRowGAYDVQQDExF3
+ZWJsb2dpYy1vcGVyYXRvcjAeFw0yMDA1MTAwNjE0MjFaFw0zMDA1MDgwNjE0MjFa
+MBwxGjAYBgNVBAMTEXdlYmxvZ2ljLW9wZXJhdG9yMIIBIjANBgkqhkiG9w0BAQEF
+AAOCAQ8AMIIBCgKCAQEAmJvo6Hfj783ztbxgTAXkcmT9eIt0asKgj+RKVWXWD3Sa
+F+EsuL4XQATPsYc84Ak9hKQkR3WaSVA7vkEz7C6R++8w6TTHtYA25ebqZHQ0MSuR
+XamFoF/7zJFL4YZRPR52/aPw6MwROtPKP1CHTlVgiuB9yf5nlgorLomThRagX8If
+3pzmVZ80aibyViy611KIuJxZn2JfwRl2LAifxC+RtUtsQtjbE+tH1+b2Z4FQdR0E
+SWpwd4j4u/YAPmBjT/0tw/Y1xGzWcHejpRWMgUBNyhzGoee1lhDRW+1LiVjb94mm
+0i5yy/8ZvUOST27bUcOt4G2OEaNpAWTWVo9Fvzyf9wIDAQABo2IwYDALBgNVHQ8E
+BAMCA/gwMgYDVR0RBCswKYIJbG9jYWxob3N0hwR/AAABhwSBksSLhwSTmmdphwQK
+AAoPhwQKAAoQMB0GA1UdDgQWBBRgfUINa1OZ+jGY4nWT7doR98B1+DANBgkqhkiG
+9w0BAQsFAAOCAQEAQ8d1izy6Xsqh5u4sWU2XB/+2tQVlpXfW0KFA8TKQRxfJIINR
+PG82CyGIqcGf6pVvzVmHVjcv3jRrcQLu5UNfLhDi71UyC4wBsTxG7UjYJcKi5H3j
+5XojxeWodFRNS28/mMWFl4glZh/efXJSu3fwAfIDh5e0yCEtrxYx45DbfhT3eetM
+JvKd7NfQBWKC5kpb0WAaLicMs8ufOMWW0237sAks8haTctzUMfnXlwEd5ic4H8FO
+u0bhI+0JVZu9JA+BQoolSerlbTx0fnYzbLDRLQuSFzAPxcjCrRiU8aelEqRBy3JF
+LjgDVQtZ4xkOZeDC4ddgHc9hipQLvu4XVQUIZg==
+-----END CERTIFICATE-----
+Ready to call operator REST APIs
+* About to connect() to 10.0.10.15 port 31001 (#0)
+*   Trying 10.0.10.15...
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0* Connected to 10.0.10.15 (10.0.10.15) port 31001 (#0)
+* Initializing NSS with certpath: sql:/etc/pki/nssdb
+*   CAfile: /tmp/operator.cert.pem
+  CApath: none
+* SSL connection using TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+* Server certificate:
+*       subject: CN=weblogic-operator
+*       start date: May 10 06:14:21 2020 GMT
+*       expire date: May 08 06:14:21 2030 GMT
+*       common name: weblogic-operator
+*       issuer: CN=weblogic-operator
+> GET /operator HTTP/1.1
+> User-Agent: curl/7.29.0
+> Host: 10.0.10.15:31001
+> Authorization: Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJ3ZWJsb2d                                                                     pYy1vcGVyYXRvci1ucyIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJ3ZWJsb2dpYy1vcGVyYXRvci1zYS10b2tlbi1seng3dCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2V                                                                     ydmljZS1hY2NvdW50Lm5hbWUiOiJ3ZWJsb2dpYy1vcGVyYXRvci1zYSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6IjA0ZTcwNWQwLWZiZTgtNDgzYi05NjMwLTgwNTQ2MDM                                                                     1ZmQ5YyIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDp3ZWJsb2dpYy1vcGVyYXRvci1uczp3ZWJsb2dpYy1vcGVyYXRvci1zYSJ9.ybBcexm36bvVgVm62gjxAHhcfRq_k_um163oEvdcPk-sPXy8DMUk413BsvI9Ep                                                                     tAUkuEMx8VJodAf7IkyiiB4rDLvhfbiBN9rtLP1LUPu_oScfCiPEKgQDqqdnC5UBtOENRL1s83otL5hIjB3hhIkhvKaW5lSzeJnEUxAIb_qOw2_fKiM5j_KnHlJQZRjjGlJ28WYJ-IGflfc0Qu69OScDsSI_gXml296EJXYl                                                                     n_wRfc7V6lwcOGuexiwE7j3HAdnLvcLdZxNeu_sAbbhudJi1TiDZEtHopAtjiRSHwXkcqW2hN7uOvlXBYO0CsQRtKaljPutm9QUED864_a64D0EA
+> Accept:application/json
+>
+< HTTP/1.1 200 OK
+< Content-Type: application/json
+< Content-Length: 279
+<
+{ [data not shown]
+100   279  100   279    0     0    313      0 --:--:-- --:--:-- --:--:--   314
+* Connection #0 to host 10.0.10.15 left intact
+{
+  "links": [
+    {
+      "rel": "self",
+      "title": "",
+      "href": "/operator"
+    },
+    {
+      "rel": "canonical",
+      "title": "",
+      "href": "/operator"
+    }
+  ],
+  "items": [
+    {
+      "links": [
+        {
+          "rel": "self",
+          "title": "",
+          "href": "/operator/v1"
+        },
+        {
+          "rel": "canonical",
+          "title": "",
+          "href": "/operator/v1"
+        }
+      ],
+      "version": "v1",
+      "latest": true,
+      "lifecycle": "active"
+    }
+  ]
+}
+```
+
 #### ELK Log Index Creation ####
 
 The WebLogic Operator has been installed. You can also check if the log of WebLogic Operator already sent to elasticsearch and kibana, by accessing the kibana dashboard, click discover menu and create index pattern to process log from WebLogic Operator, but typing logstash and click Next Step:
