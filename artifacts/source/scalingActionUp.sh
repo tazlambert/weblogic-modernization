@@ -203,7 +203,12 @@ then
   new_ms=$(($num_ms + $scaling_size))
 else
   # Scale down by specified scaling size 
-  new_ms=$(($num_ms - $scaling_size))
+  if [ $num_ms == 1 ]
+  then
+    exit 0
+  else
+    new_ms=$(($num_ms - $scaling_size))
+  fi
 fi
 
 echo "new_ms is $new_ms" >> scalingAction.log
