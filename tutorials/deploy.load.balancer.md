@@ -7,7 +7,7 @@ The Oracle WebLogic Server Kubernetes Operator supports Oracle Cloud Infrastruct
 
 Go to your bastion host and copy paste this command to create Ingress Controller:
 
-    kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/mandatory.yaml
+    kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/nginx-0.30.0/deploy/static/mandatory.yaml
 
 The above script will create several resources such as namespaces, configMap, etc.
 
