@@ -208,6 +208,97 @@ sample-domain1-managed-server2   0/1       Running   0          1m        10.244
 ```
 You have to see three running pods similar to the result above. If you don't see all the running pods please wait and check periodically. The whole domain deployment may take up to 2-3 minutes depending on the compute shapes.
 
+Below is the sample if we access from REST API, in this case to find what is the domain name that have just deployed:
+```
+./restClient.sh 10.0.10.15 operator/latest/domains
+```
+Below is the expected results:
+```
+-----BEGIN CERTIFICATE-----
+MIIDGDCCAgCgAwIBAgIEH6YWnzANBgkqhkiG9w0BAQsFADAcMRowGAYDVQQDExF3
+ZWJsb2dpYy1vcGVyYXRvcjAeFw0yMDA1MTAwNjE0MjFaFw0zMDA1MDgwNjE0MjFa
+MBwxGjAYBgNVBAMTEXdlYmxvZ2ljLW9wZXJhdG9yMIIBIjANBgkqhkiG9w0BAQEF
+AAOCAQ8AMIIBCgKCAQEAmJvo6Hfj783ztbxgTAXkcmT9eIt0asKgj+RKVWXWD3Sa
+F+EsuL4XQATPsYc84Ak9hKQkR3WaSVA7vkEz7C6R++8w6TTHtYA25ebqZHQ0MSuR
+XamFoF/7zJFL4YZRPR52/aPw6MwROtPKP1CHTlVgiuB9yf5nlgorLomThRagX8If
+3pzmVZ80aibyViy611KIuJxZn2JfwRl2LAifxC+RtUtsQtjbE+tH1+b2Z4FQdR0E
+SWpwd4j4u/YAPmBjT/0tw/Y1xGzWcHejpRWMgUBNyhzGoee1lhDRW+1LiVjb94mm
+0i5yy/8ZvUOST27bUcOt4G2OEaNpAWTWVo9Fvzyf9wIDAQABo2IwYDALBgNVHQ8E
+BAMCA/gwMgYDVR0RBCswKYIJbG9jYWxob3N0hwR/AAABhwSBksSLhwSTmmdphwQK
+AAoPhwQKAAoQMB0GA1UdDgQWBBRgfUINa1OZ+jGY4nWT7doR98B1+DANBgkqhkiG
+9w0BAQsFAAOCAQEAQ8d1izy6Xsqh5u4sWU2XB/+2tQVlpXfW0KFA8TKQRxfJIINR
+PG82CyGIqcGf6pVvzVmHVjcv3jRrcQLu5UNfLhDi71UyC4wBsTxG7UjYJcKi5H3j
+5XojxeWodFRNS28/mMWFl4glZh/efXJSu3fwAfIDh5e0yCEtrxYx45DbfhT3eetM
+JvKd7NfQBWKC5kpb0WAaLicMs8ufOMWW0237sAks8haTctzUMfnXlwEd5ic4H8FO
+u0bhI+0JVZu9JA+BQoolSerlbTx0fnYzbLDRLQuSFzAPxcjCrRiU8aelEqRBy3JF
+LjgDVQtZ4xkOZeDC4ddgHc9hipQLvu4XVQUIZg==
+-----END CERTIFICATE-----
+Ready to call operator REST APIs
+* About to connect() to 10.0.10.15 port 31001 (#0)
+*   Trying 10.0.10.15...
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0* Connected to 10.0.10.15 (10.0.10.15) port 31001 (#0)
+* Initializing NSS with certpath: sql:/etc/pki/nssdb
+*   CAfile: /tmp/operator.cert.pem
+  CApath: none
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0* SSL connection using TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+* Server certificate:
+*       subject: CN=weblogic-operator
+*       start date: May 10 06:14:21 2020 GMT
+*       expire date: May 08 06:14:21 2030 GMT
+*       common name: weblogic-operator
+*       issuer: CN=weblogic-operator
+> GET /operator/latest/domains/ HTTP/1.1
+> User-Agent: curl/7.29.0
+> Host: 10.0.10.15:31001
+> Authorization: Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJ3ZWJsb2dpYy1vcGVyYXRvci1ucyIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJ3ZWJsb2dpYy1vcGVyYXRvci1zYS10b2tlbi1seng3dCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJ3ZWJsb2dpYy1vcGVyYXRvci1zYSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6IjA0ZTcwNWQwLWZiZTgtNDgzYi05NjMwLTgwNTQ2MDM1ZmQ5YyIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDp3ZWJsb2dpYy1vcGVyYXRvci1uczp3ZWJsb2dpYy1vcGVyYXRvci1zYSJ9.ybBcexm36bvVgVm62gjxAHhcfRq_k_um163oEvdcPk-sPXy8DMUk413BsvI9EptAUkuEMx8VJodAf7IkyiiB4rDLvhfbiBN9rtLP1LUPu_oScfCiPEKgQDqqdnC5UBtOENRL1s83otL5hIjB3hhIkhvKaW5lSzeJnEUxAIb_qOw2_fKiM5j_KnHlJQZRjjGlJ28WYJ-IGflfc0Qu69OScDsSI_gXml296EJXYln_wRfc7V6lwcOGuexiwE7j3HAdnLvcLdZxNeu_sAbbhudJi1TiDZEtHopAtjiRSHwXkcqW2hN7uOvlXBYO0CsQRtKaljPutm9QUED864_a64D0EA
+> Accept:application/json
+>
+< HTTP/1.1 200 OK
+< Content-Type: application/json
+< Content-Length: 396
+<
+{ [data not shown]
+100   396  100   396    0     0   1100      0 --:--:-- --:--:-- --:--:--  1100
+* Connection #0 to host 10.0.10.15 left intact
+{
+  "links": [
+    {
+      "rel": "self",
+      "title": "",
+      "href": "/operator/latest/domains"
+    },
+    {
+      "rel": "canonical",
+      "title": "",
+      "href": "/operator/latest/domains"
+    },
+    {
+      "rel": "parent",
+      "title": "",
+      "href": "/operator/latest"
+    }
+  ],
+  "items": [
+    {
+      "links": [
+        {
+          "rel": "self",
+          "title": "",
+          "href": "/operator/latest/domains/wls-k8s-domain"
+        },
+        {
+          "rel": "canonical",
+          "title": "",
+          "href": "/operator/latest/domains/wls-k8s-domain"
+        }
+      ],
+      "domainUID": "wls-k8s-domain"
+    }
+  ]
+}
+```
 Beside that we can check from all the monitoring system that was craeted before from the bastion host, we can check from ELK stack especially Kibana to know if the log already being sent to the Elasticsearch or not, of course we need to [create additional index pattern](https://github.com/tazlambert/weblogic-modernization/blob/master/tutorials/setup.wko.md#elk-log-index-creation) (wls)
 
 ![alt text](images/deploy.domain/domainKibana.png)
