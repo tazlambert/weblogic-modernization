@@ -94,7 +94,10 @@ weblogicDomainStorageSize: 10Gi
 ```
 After finish editing the input file then we can execute the process to create new PV n PVC for WebLogic image:
 ```
-[opc@bastion1 create-weblogic-domain-pv-pvc]$ ./create-pv-pvc.sh -i create-pv-pvc-inputs.yaml -o output/ -e
+./create-pv-pvc.sh -i create-pv-pvc-inputs.yaml -o output/ -e
+```
+Expected output will be like below:
+```
 Input parameters being used
 export version="create-weblogic-sample-domain-pv-pvc-inputs-v1"
 export baseName="wls-k8s-domain"
