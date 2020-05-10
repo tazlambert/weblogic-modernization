@@ -8,10 +8,10 @@ echo "called scalingAction.sh" >> scalingAction.log
 scaling_action=""
 wls_domain_uid=""
 wls_cluster_name=""
-wls_domain_namespace="wls-k8s-domain-ns"
+wls_domain_namespace="default"
 operator_service_name="internal-weblogic-operator-svc"
-operator_namespace="weblogic-operator-ns"
-operator_service_account="weblogic-operator-sa"
+operator_namespace="weblogic-operator"
+operator_service_account="weblogic-operator"
 scaling_size=1
 access_token=""
 kubernetes_master="https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"
@@ -69,8 +69,7 @@ done
 # Verify required parameters
 if [ -z "$scaling_action" ] || [ -z "$wls_domain_uid" ] || [ -z "$wls_cluster_name" ]
 then
-    echo "Usage: scalingAction.sh --action=[scaleUp | scaleDown] --domain_uid=<domain uid> --cluster_name=<cluster name> [--kubernetes_master=https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}] [--access_token=<access_token>]
-[--wls_domain_namespace=default] [--operator_namespace=weblogic-operator] [--operator_service_name=weblogic-operator] [--scaling_size=1]"
+    echo "Usage: scalingAction.sh --action=[scaleUp | scaleDown] --domain_uid=<domain uid> --cluster_name=<cluster name> [--kubernetes_master=https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}] [--access_token=<access_token>] [--wls_domain_namespace=default] [--operator_namespace=weblogic-operator] [--operator_service_name=weblogic-operator] [--scaling_size=1]"
     echo "  where"
     echo "    action - scaleUp or scaleDown"
     echo "    domain_uid - WebLogic Domain Unique Identifier"
@@ -101,8 +100,7 @@ echo "operator_namespace: $operator_namespace" >> scalingAction.log
 echo "scaling_size: $scaling_size" >> scalingAction.log
 
 # Query WebLogic Operator Service Port
-STATUS=`curl -v --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt -H "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" -X GET $kubernetes_master/api/v1/namespaces/$operator_namespace/services/
-$operator_service_name/status`
+STATUS=`curl -v --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt -H "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" -X GET $kubernetes_master/api/v1/namespaces/$operator_namespace/services/$operator_service_name/status` 
 if [ $? -ne 0 ]
   then
     echo "Failed to retrieve status of $operator_service_name in name space: $operator_namespace" >> scalingAction.log
@@ -120,8 +118,7 @@ port=`echo ${STATUS} | python cmds.py`
 echo "port: $port" >> scalingAction.log
 
 # Retrieve Custom Resource Definition for WebLogic domain
-CRD=`curl -v --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt -H "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" -X GET $kubernetes_master/apis/apiextensions.k8s.io/v1beta1/customresourcede
-finitions/domains.weblogic.oracle`
+CRD=`curl -v --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt -H "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" -X GET $kubernetes_master/apis/apiextensions.k8s.io/v1beta1/customresourcedefinitions/domains.weblogic.oracle`
 if [ $? -ne 0 ]
   then
     echo "Failed to retrieve Custom Resource Definition for WebLogic domain" >> scalingAction.log
@@ -137,9 +134,8 @@ INPUT
 domain_api_version=`echo ${CRD} | python cmds.py`
 echo "domain_api_version: $domain_api_version" >> scalingAction.log
 
-# Reteive Custom Resource Domain
-DOMAIN=`curl -v --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt -H "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" $kubernetes_master/apis/weblogic.oracle/$domain_api_version/namespaces/$w
-ls_domain_namespace/domains/$domain_uid`
+# Reteive Custom Resource Domain 
+DOMAIN=`curl -v --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt -H "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" $kubernetes_master/apis/weblogic.oracle/$domain_api_version/namespaces/$wls_domain_namespace/domains/$domain_uid`
 if [ $? -ne 0 ]
   then
     echo "Failed to retrieve WebLogic Domain Custom Resource Definition" >> scalingAction.log
@@ -197,10 +193,10 @@ echo "current number of managed servers is $num_ms" >> scalingAction.log
 # Calculate new managed server count
 if [ "$scaling_action" == "scaleUp" ]
 then
-  # Scale up by specified scaling size
+  # Scale up by specified scaling size 
   new_ms=$(($num_ms + $scaling_size))
 else
-  # Scale down by specified scaling size
+  # Scale down by specified scaling size 
   new_ms=$(($num_ms - $scaling_size))
 fi
 
@@ -208,7 +204,7 @@ echo "new_ms is $new_ms" >> scalingAction.log
 
 request_body=$(cat <<EOF
 {
-    "managedServerCount": $new_ms
+    "managedServerCount": $new_ms 
 }
 EOF
 )
@@ -252,4 +248,4 @@ fi
 echo $result >> scalingAction.log
 
 # Cleanup generated operator PEM file
-[ -e $pem_filename ] && rm $pem_filename
+[ -e $pem_filename ] && rm $pem_filename 
