@@ -9,7 +9,7 @@ The idea of autosacling is adding managed server automatically based on rules th
 
 The WebLogic Diagnostics Framework (WLDF) is a suite of services and APIs that collect and surface metrics that provide visibility into server and application performance. To support automatic scaling of WebLogic clusters in Kubernetes, WLDF provides the Policies and Actions component, which lets you write policy expressions for automatically executing scaling operations on a cluster. These policies monitor one or more types of WebLogic Server metrics, such as memory, idle threads, and CPU load. When the configured threshold in a policy is met, the policy is triggered, and the corresponding scaling action is executed. The WebLogic Server Kubernetes Operator project provides a shell script, scalingAction.sh, for use as a Script Action, which illustrates how to issue a request to the operator’s REST endpoint.
 
-For this labs we are going to copy the original scalingAction.sh into 2 shell script; one is to scale up, scalingActionUp.sh, and one to scale down, scalingActionDown.sh. Here is the original parameter (line 7-17) that is needed to be change:
+For this labs we are going to monitor http sessions of testwebapp application that we deploy to scale up or scale down and we are going to copy the original scalingAction.sh into 2 shell script; one is to scale up, scalingActionUp.sh, and one to scale down, scalingActionDown.sh. Here is the original parameter (line 7-17) that is needed to be change:
 ```
 # script parameters
 scaling_action=""
@@ -146,4 +146,85 @@ cd bin/scripts
 cp /tmp/scalingActionUp.sh .
 cp /tmp/scalingActionDown.sh .
 ```
-Then now we need to configure the WLDF part from WebLogic Console 
+Then now we need to configure the WLDF part from WebLogic Console, open the console then from Domain Structure, choose the Diagnostics then Diagnostic Modules, then click new, in this page input the module name as below
+
+![alt text](images/wldf/wldf1.png)
+
+Then from the newly created Modules we choose targets make sure to choose admin server and leave the cluster empty like belwo
+
+![alt text](images/wldf/wldf2.png)
+
+Then we go back to the configuration part and choose collected metrics tab, for this labs we put the sampling period into 10000 (10s) and click New, like below:
+
+![alt text](images/wldf/wldf3.png)
+
+In this page we choose serverRuntime like below:
+
+![alt text](images/wldf/wldf4.png)
+
+Then click next and choose the MBean to be monitored, since we are going to monitor the sessions of the sample testwebapp applications then we choose like below:
+
+![alt text](images/wldf/wldf5.png)
+
+This is the final part of collected metrics
+
+![alt text](images/wldf/wldf6.png)
+
+Then we choose policies and actions tab, choose policies tab and click new,
+
+![alt text](images/wldf/wldf7.png)
+
+Input the policy name and choose collected metrics in the tab like below:
+
+![alt text](images/wldf/wldf8.png)
+
+Input the policy expression inside the textbox, the rules will be = For the cluster cluster-1, WLDF will monitor the OpenSessionsCurrentCount attribute of the WebAppComponentRuntimeMBean for the testwebapp application.  If the OpenSessionsCurrentCount is greater than or equal to 0.01 for 5 per cent of the Managed Server instances in the cluster, then the policy will be evaluated as true. Metrics will be collected at a sampling rate of 1 second, and the sample data will be averaged out over the specified 10 second period of time of the retention window. Below is for scaling up:
+```
+wls:ClusterGenericMetricRule("cluster-1","com.bea:Type=WebAppComponentRuntime,ApplicationRuntime=testwebapp,*","OpenSessionsCurrentCount",">=",0.01,5,"1 seconds","10 seconds")
+```
+Below is for scaling down:
+```
+wls:ClusterGenericMetricRule("cluster-1","com.bea:Type=WebAppComponentRuntime,ApplicationRuntime=testwebapp,*","OpenSessionsCurrentCount","<=",0.01,5,"1 seconds","10 seconds")
+```
+![alt text](images/wldf/wldf9.png)
+
+Then we choose every n seconds and every 1 seconds like below:
+
+![alt text](images/wldf/wldf10.png)
+![alt text](images/wldf/wldf11.png)
+
+Then we configure alarm and alarm's reset policy like below:
+
+![alt text](images/wldf/wldf12.png)
+
+Clik Finish first because we have not created the actions for this policy.
+
+![alt text](images/wldf/wldf13.png)
+
+Now we go back to Policies and Actions we choose actions and click new:
+
+![alt text](images/wldf/wldf14.png)
+
+Choose the type as script like below
+
+![alt text](images/wldf/wldf15.png)
+
+Input the action name like below:
+
+![alt text](images/wldf/wldf16.png)
+
+Input the working directory which will be the domain home and the script location like below:
+
+![alt text](images/wldf/wldf17.png)
+
+So we need to create 2 actions each will use scalingActionUp.sh and scalingActionDown.sh like below:
+
+![alt text](images/wldf/wldf18.png)
+
+Then we go back to Policies and Actions tab choose scaleUpPolicy, click actions the in the diagnostic actions choose scaleUpScript. we must do the same for scaleDownPolicy with scaleDownScript.
+
+![alt text](images/wldf/wldf19.png)
+
+After this finish, you can just open the browser and access the load balancer service to go the testwebapp service port several times, or you can see that in the prometheus:
+
+![alt text](images/wldf/wldf20.png)
