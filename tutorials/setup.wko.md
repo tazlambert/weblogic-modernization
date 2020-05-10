@@ -65,9 +65,16 @@ While the Load Balancer IP can be looked up by click burger menu, click Networki
 
 ![](images/wko/wkoLBIP.png)
 
+And we need to include also the IP of each Kubernetes Cluster Nodes into the certificate:
+```
+[opc@bastion1 ~]$ kubectl get nodes
+NAME         STATUS   ROLES   AGE     VERSION
+10.0.10.15   Ready    node    3m4s    v1.15.7
+10.0.10.16   Ready    node    3m10s   v1.15.7
+```
 The certificate cannot be conveniently changed after installation of the operator. The script creates the secret in the weblogic-operator namespace with the self-signed certificate and private key.
 
-    ./generate-external-rest-identity.sh DNS:localhost,IP:127.0.0.1,IP:129.146.196.139,IP:147.154.103.105 -n weblogic-operator-ns > selfsignedcert.yaml
+    ./generate-external-rest-identity.sh DNS:localhost,IP:127.0.0.1,IP:129.146.196.139,IP:147.154.103.105,IP:10.0.10.15,IP:10.0.10.16 -n weblogic-operator-ns > selfsignedcert.yaml
 
 The result of above script will be like this:
 
@@ -163,6 +170,8 @@ NAME                             TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(
 external-weblogic-operator-svc   NodePort    10.96.233.80    <none>        8081:31001/TCP   58s
 internal-weblogic-operator-svc   ClusterIP   10.96.218.169   <none>        8082/TCP         58s
 ```
+#### ELK Log Index Creation ####
+
 The WebLogic Operator has been installed. You can also check if the log of WebLogic Operator already sent to elasticsearch and kibana, by accessing the kibana dashboard, click discover menu and create index pattern to process log from WebLogic Operator, but typing logstash and click Next Step:
 ![](images/wko/wko_kibana1.png)
 
