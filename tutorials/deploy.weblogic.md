@@ -208,6 +208,8 @@ sample-domain1-managed-server2   0/1       Running   0          1m        10.244
 ```
 You have to see three running pods similar to the result above. If you don't see all the running pods please wait and check periodically. The whole domain deployment may take up to 2-3 minutes depending on the compute shapes.
 
+#### Testing REST API ####
+
 Below is the sample if we access from REST API, in this case to find what is the domain name that have just deployed:
 ```
 ./restClient.sh 10.0.10.15 operator/latest/domains
@@ -299,6 +301,8 @@ Ready to call operator REST APIs
   ]
 }
 ```
+#### Testing Monitoring Tools ####
+
 Beside that we can check from all the monitoring system that was craeted before from the bastion host, we can check from ELK stack especially Kibana to know if the log already being sent to the Elasticsearch or not, of course we need to [create additional index pattern](https://github.com/tazlambert/weblogic-modernization/blob/master/tutorials/setup.wko.md#elk-log-index-creation) (wls)
 
 ![alt text](images/deploy.domain/domainKibana.png)
