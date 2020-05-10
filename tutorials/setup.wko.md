@@ -156,7 +156,13 @@ Check the operator pod, supposed there are 2 component inside; weblogic-operator
 NAME                                 READY   STATUS    RESTARTS   AGE
 weblogic-operator-5bb44c9bd4-9m7rr   2/2     Running   0          15m
 ```
-
+From the service part we can see two services created, one is external for RET API and the other is for internal communication: 
+```
+[opc@bastion1 weblogic-kubernetes-operator]$ kubectl get svc -n weblogic-operator-ns
+NAME                             TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+external-weblogic-operator-svc   NodePort    10.96.233.80    <none>        8081:31001/TCP   58s
+internal-weblogic-operator-svc   ClusterIP   10.96.218.169   <none>        8082/TCP         58s
+```
 The WebLogic Operator has been installed. You can also check if the log of WebLogic Operator already sent to elasticsearch and kibana, by accessing the kibana dashboard, click discover menu and create index pattern to process log from WebLogic Operator, but typing logstash and click Next Step:
 ![](images/wko/wko_kibana1.png)
 
