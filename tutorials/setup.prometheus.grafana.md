@@ -215,7 +215,7 @@ alertmanagerFiles:
 serverFiles:
   alerts:
     groups:
-      - name: node_rules
+      - name: weblogic_rules
         rules:
           - alert: ClusterWarning
             for: 1m
@@ -225,6 +225,22 @@ serverFiles:
             annotations:
               description: 'Some WLS cluster has only one running server for more than 1 minutes.'
               summary: 'Some wls cluster is in warning state.'
+          - alert: ScaleUpNotification
+            for: 1m
+            expr: sum(wls_webapp_config_open_sessions_current_count{app="testwebapp"}) > 15
+            labels:
+              severity: page
+            annotations:
+              description: 'Scale up when current sessions is greater than 15.'
+              summary: 'Firing alert when total sessions active greater than 15.'
+          - alert: ScaleDownNotification
+            for: 1m
+            expr: sum(wls_webapp_config_open_sessions_current_count{app="testwebapp"}) < 15
+            labels:
+              severity: page
+            annotations:
+              description: 'Scale up when current sessions is greater than 15.'
+              summary: 'Firing alert when total sessions active greater than 15.'
 
 extraScrapeConfigs: |
     - job_name: 'wls-k8s-domain'
