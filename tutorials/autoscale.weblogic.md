@@ -1,11 +1,6 @@
-# Auto Scaling WebLogic Cluster #
+# Auto Scaling WebLogic Cluster using WLDF #
 
-The idea of autosacling is adding managed server automatically based on rules that is created and the rules will be measured based on the metrics that come from WebLogic Cluster;
-
-- Using a WLDF policy rule and script action to call the operator's REST scale API.
-- Using a Prometheus alert action to call the operator's REST scale API.
-
-#### Scaling WebLogic cluster using WLDF  ####
+#### Scaling WebLogic cluster ####
 
 The WebLogic Diagnostics Framework (WLDF) is a suite of services and APIs that collect and surface metrics that provide visibility into server and application performance. To support automatic scaling of WebLogic clusters in Kubernetes, WLDF provides the Policies and Actions component, which lets you write policy expressions for automatically executing scaling operations on a cluster. These policies monitor one or more types of WebLogic Server metrics, such as memory, idle threads, and CPU load. When the configured threshold in a policy is met, the policy is triggered, and the corresponding scaling action is executed. The WebLogic Server Kubernetes Operator project provides a shell script, scalingAction.sh, for use as a Script Action, which illustrates how to issue a request to the operator’s REST endpoint.
 
@@ -22,6 +17,53 @@ operator_service_account="weblogic-operator"
 scaling_size=1
 access_token=""
 kubernetes_master="https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"
+```
+The script `scalingAction.sh`, specified in the WLDF script action above, needs the appropriate RBAC permissions granted for the service account user (in the namespace in which the WebLogic domain is deployed) in order to query the Kubernetes API server for both configuration and runtime information of the domain custom resource. The following is an example YAML file for creating the appropriate Kubernetes cluster role bindings:
+
+```
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: weblogic-domain-cluster-role
+rules:
+- apiGroups: ["weblogic.oracle"]
+  resources: ["domains"]
+  verbs: ["get", "list", "update"]
+---
+#
+# creating role-bindings for cluster role
+#
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: domain-cluster-rolebinding
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: weblogic-domain-ns
+  apiGroup: ""
+roleRef:
+  kind: ClusterRole
+  name: weblogic-domain-cluster-role
+  apiGroup: "rbac.authorization.k8s.io"
+---
+#
+# creating role-bindings
+#
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: weblogic-domain-operator-rolebinding
+  namespace: weblogic-operator-ns
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: wls-k8s-domain-ns
+  apiGroup: ""
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: "rbac.authorization.k8s.io"
 ```
 For scalingActionUp.sh it will be:
 ```
