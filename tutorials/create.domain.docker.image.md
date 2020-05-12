@@ -61,6 +61,15 @@ If you got error usually means that the logged in user is not authorized, to ena
 sudo groupadd docker 
 sudo usermod -aG docker opc
 ```
+Beside that you might want to enable vncserver and desktop for Linux
+```
+sudo yum install vnc-server -y
+sudo sed -i 's/^SELINUX=enforcing/SELINUX=permissive/' /etc/selinux/config
+sudo systemctl stop firewalld
+sudo systemctl disable firewalld
+sudo yum groups install "Server with GUI" --skip-broken -y
+vcnserver
+```
 #### Prepare Java SDK and Docker in bastion ####
 First we need to download [Java SDK](https://www.oracle.com/java/technologies/javase-jdk8-downloads.html), in this case we choose 8u251, and upload that to bastion host in the directory /home/opc
 ```
