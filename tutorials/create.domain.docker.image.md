@@ -70,6 +70,8 @@ sudo systemctl disable firewalld
 sudo yum groups install "Server with GUI" --skip-broken -y
 vcnserver
 ```
+Then we can open the vncserver to access bastion host desktop and use firefox to download requried JDK.
+
 #### Prepare Java SDK and Docker in bastion ####
 First we need to download [Java SDK](https://www.oracle.com/java/technologies/javase-jdk8-downloads.html), in this case we choose 8u251, and upload that to bastion host in the directory /home/opc
 ```
