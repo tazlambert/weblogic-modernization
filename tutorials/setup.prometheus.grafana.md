@@ -264,6 +264,8 @@ The most important part for Prometheus configuration is in extraScrapeConfigs, s
 
 After checking we can proceed with the installation process:
 ```
+helm repo add stable https://kubernetes-charts.storage.googleapis.com
+helm repo update
 helm install --wait prometheus --namespace monitoring --values prometheus/values.yaml stable/prometheus
 ```
 The expected result will be:
