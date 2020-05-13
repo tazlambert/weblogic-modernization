@@ -30,9 +30,6 @@ rules:
   resources: ["domains"]
   verbs: ["get", "list", "update"]
 ---
-#
-# creating role-bindings for cluster role
-#
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
@@ -47,9 +44,6 @@ roleRef:
   name: weblogic-domain-cluster-role
   apiGroup: "rbac.authorization.k8s.io"
 ---
-#
-# creating role-bindings
-#
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
