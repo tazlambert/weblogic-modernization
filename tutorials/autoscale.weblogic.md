@@ -21,6 +21,7 @@ kubernetes_master="https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}
 The script `scalingAction.sh`, specified in the WLDF script action above, needs the appropriate RBAC permissions granted for the service account user (in the namespace in which the WebLogic domain is deployed) in order to query the Kubernetes API server for both configuration and runtime information of the domain custom resource. The following is an example YAML file for creating the appropriate Kubernetes cluster role bindings:
 
 ```
+cat << EOF | kubectl apply -f -
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
@@ -58,6 +59,7 @@ roleRef:
   kind: ClusterRole
   name: cluster-admin
   apiGroup: "rbac.authorization.k8s.io"
+EOF  
 ```
 For scalingActionUp.sh it will be:
 ```
