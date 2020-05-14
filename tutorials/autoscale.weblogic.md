@@ -38,7 +38,7 @@ metadata:
 subjects:
 - kind: ServiceAccount
   name: default
-  namespace: weblogic-domain-ns
+  namespace: wls-k8s-domain-ns
   apiGroup: ""
 roleRef:
   kind: ClusterRole
