@@ -65,12 +65,29 @@ Beside that you might want to enable vncserver and desktop for Linux
 ```
 sudo yum install vnc-server -y
 sudo sed -i 's/^SELINUX=enforcing/SELINUX=permissive/' /etc/selinux/config
+sudo /usr/sbin/setenforce 0
 sudo systemctl stop firewalld
 sudo systemctl disable firewalld
 sudo yum groups install "Server with GUI" --skip-broken -y
 vcnserver
 ```
-Then we can open the vncserver to access bastion host desktop and use firefox to download requried JDK.
+The last command will start the service to enable Desktop environment for the specific user that run it (opc) just input the password when prompted, this password will be used as authentication for VNC service.
+```
+You will require a password to access your desktops.
+
+Password:
+Verify:
+Would you like to enter a view-only password (y/n)?
+A view-only password is not used
+
+New 'weblogic1:1 (opc)' desktop is weblogic1:1
+
+Creating default startup script /home/opc/.vnc/xstartup
+Creating default config /home/opc/.vnc/config
+Starting applications specified in /home/opc/.vnc/xstartup
+Log file is /home/opc/.vnc/weblogic1:1.log
+```
+Then we can reboot then open the vncserver to access bastion host desktop and use firefox to download requried JDK.
 
 #### Prepare Java SDK and Docker in bastion ####
 First we need to download [Java SDK](https://www.oracle.com/java/technologies/javase-jdk8-downloads.html), in this case we choose 8u251, and upload that to bastion host in the directory /home/opc
@@ -118,13 +135,6 @@ sudo systemctl enable docker
 sudo chkconfig docker on
 ```
 Above commands will enable docker engine capability in bastion and auto start docker engine after reboot. Beside this, we need to check also the firewall and SELinux in the bastion OS, make sure it open the required ports.
-```
-sudo sed -i 's/^SELINUX=enforcing/SELINUX=disabled/' /etc/selinux/config
-sudo /usr/sbin/setenforce 0
-sudo systemctl stop firewalld
-sudo systemctl disable firewalld
-sudo reboot
-```
 
 #### Prepare WebLogic, Java SDK, and Domain Artifact in bastion ####
 First we create one folder to keep the binaries and artifact:
