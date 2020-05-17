@@ -43,12 +43,10 @@ This will demonstrate how to enable CI/CD process on the WebLogic domain, where 
 2. [Deploy WebLogic Domain to Kubernetes](tutorials/deploy.weblogic.md)
 3. [Deploy Ingress Load Balancer for WebLogic in Kubernetes](tutorials/deploy.load.balancer.md)
 4. [Setup Auto Scaling and End to End Monitoring for WebLogic Domain in Kubernetes](tutorials/setup.prometheus.grafana.md)
-5. [Manual Scaling WebLogic Cluster](tutorials/scale.weblogic.md)
-6. [Auto Scaling WebLogic Cluster](tutorials/autoscale.weblogic.md)
-7. [Override JDBC Datasource parameters](tutorials/override.jdbc.md)
-8. [Update Web Application](tutorials/update.application.md)
-9. [Assigning WebLogic Pods to Nodes](tutorials/node.selector.md)
-10. [Assigning WebLogic Pods to Licensed Nodes](tutorials/node.selector.license.md)
+5. [Setup Alternative Scaling for WebLogic Domain in Kubernetes](tutorials/scale.weblogic.md)
+6. [Override JDBC Datasource parameters](tutorials/override.jdbc.md)
+7. [Update Web Application](tutorials/update.application.md)
+8. [Assigning WebLogic Pods to Nodes](tutorials/node.selector.md)
 
 ![](tutorials/images/readme2.png)
 
