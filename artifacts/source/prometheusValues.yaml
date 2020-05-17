@@ -1,6 +1,3 @@
-# Copyright 2019, Oracle Corporation and/or its affiliates. All rights reserved.
-# Licensed under the Universal Permissive License v 1.0 as shown at http://oss.oracle.com/licenses/upl.
-
 serviceAccounts:
   pushgateway:
     create: false
@@ -27,6 +24,8 @@ server:
     nodePort: 30000
   securityContext:
     runAsNonRoot: false
+    fsGroup: 0
+    runAsGroup: 0
     runAsUser: 0
 
 alertmanagerFiles:
@@ -35,22 +34,40 @@ alertmanagerFiles:
       resolve_timeout: 5m
       #http_config:
        # proxy_url: 'http://www-proxy-hqdc.us.oracle.com:80'
-
     route:
       group_by: ['alertname']
       group_wait: 10s
       group_interval: 10s
       repeat_interval: 1h
-      receiver: 'logging-webhook'
+      receiver: 'web.hook'
+      routes:
+      - match:
+          alertname: ScaleUpNotification
+        receiver: web.hook.scaleup
+      - match:
+          alertname: ScaleDownNotification
+        receiver: web.hook.scaledown
     receivers:
-      - name: 'logging-webhook'
-        webhook_configs:
-        - url: 'http://webhook.webhook.svc.cluster.local:8080/log'
+    - name: 'web.hook.scaleup'
+      webhook_configs:
+      - url: 'http://10.96.224.117:9000/hooks/scaleup'
+    - name: 'web.hook.scaledown'
+      webhook_configs:
+      - url: 'http://10.96.224.117:9000/hooks/scaledown'
+    - name: 'web.hook'
+      webhook_configs:
+      - url: 'http://10.96.224.117:9000/hooks'
+    inhibit_rules:
+      - source_match:
+          severity: 'critical'
+        target_match:
+          severity: 'warning'
+        equal: ['alertname', 'dev', 'instance']
 
 serverFiles:
   alerts:
     groups:
-      - name: node_rules
+      - name: weblogic_rules
         rules:
           - alert: ClusterWarning
             for: 1m
@@ -60,6 +77,22 @@ serverFiles:
             annotations:
               description: 'Some WLS cluster has only one running server for more than 1 minutes.'
               summary: 'Some wls cluster is in warning state.'
+          - alert: ScaleUpNotification
+            for: 1m
+            expr: sum(wls_webapp_config_open_sessions_current_count{app="testwebapp"}) > 15
+            labels:
+              severity: page
+            annotations:
+              description: 'Scale up when current sessions is greater than 15.'
+              summary: 'Firing alert when total sessions active greater than 15.'
+          - alert: ScaleDownNotification
+            for: 1m
+            expr: sum(wls_webapp_config_open_sessions_current_count{app="testwebapp"}) < 15
+            labels:
+              severity: page
+            annotations:
+              description: 'Scale up when current sessions is greater than 15.'
+              summary: 'Firing alert when total sessions active greater than 15.'
 
 extraScrapeConfigs: |
     - job_name: 'wls-k8s-domain'
