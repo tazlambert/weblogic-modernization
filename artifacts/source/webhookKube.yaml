@@ -1,0 +1,60 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    name: webhook
+  name: webhook
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: webhook
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+         name: webhook
+    spec:
+      containers:
+      - image: nrt.ocir.io/nr2wduco0qov/webhook:latest
+        imagePullPolicy: Always
+        name: webhook
+        env:
+        - name: INTERNAL_OPERATOR_CERT
+          value: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUR5ekNDQXJPZ0F3SUJBZ0lFTFdqdmp6QU5CZ2txaGtpRzl3MEJBUXNGQURBY01Sb3dHQVlEVlFRREV4RjMNClpXSnNiMmRwWXkxdmNHVnlZWFJ2Y2pBZUZ3MHlNREExTVRReE56TTRNVFphRncwek1EQTFNVEl4TnpNNE1UWmENCk1Cd3hH
+akFZQmdOVkJBTVRFWGRsWW14dloybGpMVzl3WlhKaGRHOXlNSUlCSWpBTkJna3Foa2lHOXcwQkFRRUYNCkFBT0NBUThBTUlJQkNnS0NBUUVBMFE2eXdiNUpTOG1wR0tEcStCWEJYa1ZVUTRZTDdlSFptV2xCeHNNZ2loSmINCkVtRXY2bitBK25hZHY2NXBxSWcxWVN0aHVORnB0c0w1UkduZUJ2SVNmQk9XL04yZ0hHQ
+nd3SU8zb1VzRGZQRm0NCi9SenZSczFPMmdKYTRCbEdUalc2eWxJanNodm5tUEhqNHV5aE9hbmRZcjVaM3VmRjdhMkpXaHNseUtSZ0s1ZGsNClNvcHU0WTcwQnVpN08wNTVneWlnQ3Vkd3dCM285b0NHd1g3K2lBVXZhc1VUY2I2eWt3TG14UWlyalM1dkxZLzQNCnJGOEVPc3lvb2Z2c0MrM04vZjhuNWgzYkgvMHljK0
+5tRnl2dzczd0llZHFXVGMxbWhuNTdNcnEwTVRsZnJ4Ym8NCllLdmRCOEF3N1JTcVhoc0NKY0kwUGVRSGZYZkRKVW1GMERiMEdxVGxrUUlEQVFBQm80SUJFekNDQVE4d0hRWUQNClZSME9CQllFRkQ0bitCN2hrYWV5cHBjejF2TFpDV1A0WGxMTE1Bc0dBMVVkRHdRRUF3SUQrRENCNEFZRFZSMFINCkJJSFlNSUhWZ2g
+1cGJuUmxjbTVoYkMxM1pXSnNiMmRwWXkxdmNHVnlZWFJ2Y2kxemRtT0NNMmx1ZEdWeWJtRnMNCkxYZGxZbXh2WjJsakxXOXdaWEpoZEc5eUxYTjJZeTUzWldKc2IyZHBZeTF2Y0dWeVlYUnZjaTF1YzRJM2FXNTANClpYSnVZV3d0ZDJWaWJHOW5hV010YjNCbGNtRjBiM0l0YzNaakxuZGxZbXh2WjJsakxXOXdaWEpo
+ZEc5eUxXNXoNCkxuTjJZNEpGYVc1MFpYSnVZV3d0ZDJWaWJHOW5hV010YjNCbGNtRjBiM0l0YzNaakxuZGxZbXh2WjJsakxXOXcNClpYSmhkRzl5TFc1ekxuTjJZeTVqYkhWemRHVnlMbXh2WTJGc01BMEdDU3FHU0liM0RRRUJDd1VBQTRJQkFRRFANClZ1b2RycEh5Q1dpUW1Dbnd6V0tuVDFxZUtkUWhqQkdiNXA1b
+FJpcUZBNy9UclM1RnRhMUErMWFvZG80QUpCRTkNCkcxQ0xDQ2VTQU1DQXFldjcrejVicVdBUUhIQmh2Q2NkMTQ0bzFYNGFRUi9DNlZqUlBZQWRVejR5NzVOd3B1blMNCmhtZ1NmWDFOd0dyT3d1WkV4U2hwbHpPeFpHQ0ZLdHQ0bXEzcjlKVnVlM2txOXpvUi9DZi9lOFBEZVBWMGpDQUQNCjlOTnFsOUJQaGJLUStYZD
+NPak1IeWZQNDFpYzVNUk1DK09iRUE1VnJhRmlkRHpta0V3cUxqbElJZmpSQ3ZyRloNCmlwZ2hGRUZ2cEJ6WUhsckRwVUxLWUZveTdUeDRCQy93dVFwN0RJaGJrbHR4bWQyRU9nczcya3R3elRzK0EvcnYNCmN5V3FObnIxWS9LTzJvN1JTSkh3Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+        ports:
+        - containerPort: 9000
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 500m
+            memory: 2500Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
+      imagePullSecrets:
+      - name: ocirwebhooksecret
+      restartPolicy: Always
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: webhook
+  namespace: monitoring
+spec:
+  selector:
+    name: webhook
+  type: ClusterIP
+  ports:
+  - port: 9000
