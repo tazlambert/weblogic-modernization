@@ -1,4 +1,4 @@
-# Setup End to End Monitoring for WebLogic Domain in Kubernetes #
+# Setup Auto Scaling and End to End Monitoring for WebLogic Domain in Kubernetes #
 
 ### Preparation  ###
 
@@ -157,6 +157,232 @@ EOF
 
 ### Setup  ###
 
+#### Setup Webhook as Notification Receiver and Scaling Agent ####
+
+For this part of labs we are going to monitor http sessions of testwebapp application that we deploy to scale up or scale down and we are going to copy the original scalingAction.sh into 2 shell script; one is to scale up, scalingActionUp.sh, and one to scale down, scalingActionDown.sh. Here is the original parameter (line 7-17) that is needed to be change:
+```
+# script parameters
+scaling_action=""
+wls_domain_uid=""
+wls_cluster_name=""
+wls_domain_namespace="default"
+operator_service_name="internal-weblogic-operator-svc"
+operator_namespace="weblogic-operator"
+operator_service_account="weblogic-operator"
+scaling_size=1
+access_token=""
+kubernetes_master="https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"
+```
+The above script `scalingAction.sh`, needs **the appropriate RBAC permissions** granted for the service account user (in the namespace in which the webhook is deployed, in this case monitoring) in order to query custom Kubernetes API server for both configuration and runtime information of the domain custom resource. The following is an example YAML file for creating the appropriate Kubernetes cluster role bindings:
+
+```
+cat << EOF | kubectl apply -f -
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: weblogic-domain-cluster-role
+rules:
+- apiGroups: ["weblogic.oracle"]
+  resources: ["domains"]
+  verbs: ["get", "list", "update"]
+- apiGroups: ["apiextensions.k8s.io"]
+  resources: ["customresourcedefinitions"]
+  verbs: ["get", "list"]
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: domain-cluster-rolebinding
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: monitoring
+  apiGroup: ""
+roleRef:
+  kind: ClusterRole
+  name: weblogic-domain-cluster-role
+  apiGroup: "rbac.authorization.k8s.io"
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: weblogic-domain-operator-rolebinding
+  namespace: weblogic-operator-ns
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: monitoring
+  apiGroup: ""
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: "rbac.authorization.k8s.io"
+EOF
+```
+For scalingActionUp.sh it will be:
+```
+echo "called scalingActionUp.sh" >> scalingActionUp.log
+
+# script parameters
+scaling_action="scaleUp"
+wls_domain_uid="wls-k8s-domain"
+wls_cluster_name="cluster-1"
+wls_domain_namespace="wls-k8s-domain-ns"
+operator_service_name="internal-weblogic-operator-svc"
+operator_namespace="weblogic-operator-ns"
+operator_service_account="weblogic-operator-sa"
+scaling_size=1
+access_token=""
+kubernetes_master="https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"
+```
+For scalingActionDown.sh it will be:
+```
+echo "called scalingActionDown.sh" >> scalingActionDown.log
+
+# script parameters
+scaling_action="scaleDown"
+wls_domain_uid="wls-k8s-domain"
+wls_cluster_name="cluster-1"
+wls_domain_namespace="wls-k8s-domain-ns"
+operator_service_name="internal-weblogic-operator-svc"
+operator_namespace="weblogic-operator-ns"
+operator_service_account="weblogic-operator-sa"
+scaling_size=1
+access_token=""
+kubernetes_master="https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"
+```
+For those two shell script we need to get the value of INTERNAL_OPERATOR_CERT from the admin-server pod, which can be done by logging into the pod and use ENV command to show them.
+```
+kubectl get po -n wls-k8s-domain-ns
+kubectl exec -it wls-k8s-domain-admin-server -n wls-k8s-domain-ns -- /bin/bash
+env | grep INTERNAL
+```
+The value from there we need to put it on the webhookKube.yaml that will be used to deploy webhook docker image that will be created later:
+```
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    name: webhook
+  name: webhook
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: webhook
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+         name: webhook
+    spec:
+      containers:
+      - image: nrt.ocir.io/nr2wduco0qov/webhook:latest
+        imagePullPolicy: Always
+        name: webhook
+        env:
+        - name: INTERNAL_OPERATOR_CERT
+          value: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUR5ekNDQXJPZ0F3SUJBZ0lFTFdqdmp6QU5CZ2txaGtpRzl3MEJBUXNGQURBY01Sb3dHQVlEVlFRREV4RjMNClpXSnNiMmRwWXkxdmNHVnlZWFJ2Y2pBZUZ3MHlNREExTVRReE56TTRNVFphRncwek1EQTFNVEl4TnpNNE1UWmENCk1Cd3hHakFZQmdOVkJBTVRFWGRsWW14dloybGpMVzl3WlhKaGRHOXlNSUlCSWpBTkJna3Foa2lHOXcwQkFRRUYNCkFBT0NBUThBTUlJQkNnS0NBUUVBMFE2eXdiNUpTOG1wR0tEcStCWEJYa1ZVUTRZTDdlSFptV2xCeHNNZ2loSmINCkVtRXY2bitBK25hZHY2NXBxSWcxWVN0aHVORnB0c0w1UkduZUJ2SVNmQk9XL04yZ0hHQnd3SU8zb1VzRGZQRm0NCi9SenZSczFPMmdKYTRCbEdUalc2eWxJanNodm5tUEhqNHV5aE9hbmRZcjVaM3VmRjdhMkpXaHNseUtSZ0s1ZGsNClNvcHU0WTcwQnVpN08wNTVneWlnQ3Vkd3dCM285b0NHd1g3K2lBVXZhc1VUY2I2eWt3TG14UWlyalM1dkxZLzQNCnJGOEVPc3lvb2Z2c0MrM04vZjhuNWgzYkgvMHljK05tRnl2dzczd0llZHFXVGMxbWhuNTdNcnEwTVRsZnJ4Ym8NCllLdmRCOEF3N1JTcVhoc0NKY0kwUGVRSGZYZkRKVW1GMERiMEdxVGxrUUlEQVFBQm80SUJFekNDQVE4d0hRWUQNClZSME9CQllFRkQ0bitCN2hrYWV5cHBjejF2TFpDV1A0WGxMTE1Bc0dBMVVkRHdRRUF3SUQrRENCNEFZRFZSMFINCkJJSFlNSUhWZ2g1cGJuUmxjbTVoYkMxM1pXSnNiMmRwWXkxdmNHVnlZWFJ2Y2kxemRtT0NNMmx1ZEdWeWJtRnMNCkxYZGxZbXh2WjJsakxXOXdaWEpoZEc5eUxYTjJZeTUzWldKc2IyZHBZeTF2Y0dWeVlYUnZjaTF1YzRJM2FXNTANClpYSnVZV3d0ZDJWaWJHOW5hV010YjNCbGNtRjBiM0l0YzNaakxuZGxZbXh2WjJsakxXOXdaWEpoZEc5eUxXNXoNCkxuTjJZNEpGYVc1MFpYSnVZV3d0ZDJWaWJHOW5hV010YjNCbGNtRjBiM0l0YzNaakxuZGxZbXh2WjJsakxXOXcNClpYSmhkRzl5TFc1ekxuTjJZeTVqYkhWemRHVnlMbXh2WTJGc01BMEdDU3FHU0liM0RRRUJDd1VBQTRJQkFRRFANClZ1b2RycEh5Q1dpUW1Dbnd6V0tuVDFxZUtkUWhqQkdiNXA1bFJpcUZBNy9UclM1RnRhMUErMWFvZG80QUpCRTkNCkcxQ0xDQ2VTQU1DQXFldjcrejVicVdBUUhIQmh2Q2NkMTQ0bzFYNGFRUi9DNlZqUlBZQWRVejR5NzVOd3B1blMNCmhtZ1NmWDFOd0dyT3d1WkV4U2hwbHpPeFpHQ0ZLdHQ0bXEzcjlKVnVlM2txOXpvUi9DZi9lOFBEZVBWMGpDQUQNCjlOTnFsOUJQaGJLUStYZDNPak1IeWZQNDFpYzVNUk1DK09iRUE1VnJhRmlkRHpta0V3cUxqbElJZmpSQ3ZyRloNCmlwZ2hGRUZ2cEJ6WUhsckRwVUxLWUZveTdUeDRCQy93dVFwN0RJaGJrbHR4bWQyRU9nczcya3R3elRzK0EvcnYNCmN5V3FObnIxWS9LTzJvN1JTSkh3Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+        ports:
+        - containerPort: 9000
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 500m
+            memory: 2500Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
+      imagePullSecrets:
+      - name: ocirwebhooksecret
+      restartPolicy: Always
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webhook
+  namespace: monitoring
+spec:
+  selector:
+    name: webhook
+  type: ClusterIP
+  ports:
+  - port: 9000
+```
+Let's set up a simple webhook from this [repo](https://github.com/bhabermaas/kubernetes-projects) download the [webhook](https://github.com/bhabermaas/kubernetes-projects/raw/master/apps/webhook) then do these:
+```
+cd
+mkdir -p webhook/apps
+mkdir -p webhook/scripts
+mkdir -p webhook/webhooks
+cd webhook
+```
+Put the downloaded webhook file to webhook/apps, webhookKube.yaml to webhook, scalingActionUp.sh to webhook/scripts, scalingActionDown.sh to webhook/scripts, then we need to create hooks.json that will be put inside webhook/webhooks:
+```
+[
+  {
+    "id": "scaleup",
+    "execute-command": "/var/scripts/scalingActionUp.sh",
+    "command-working-directory": "/var/scripts",
+    "response-message": "scale-up call ok\n"
+  },
+  { "id": "scaledown",
+    "execute-command": "/var/scripts/scalingActionDown.sh",
+    "command-working-directory": "/var/scripts",
+    "response-message": "scale-down call ok\n"
+  }
+]
+```
+Also we need to create the docker file to build the image that will be placed in the webhook:
+```
+FROM store/oracle/serverjre:8
+
+COPY apps/webhook /bin/webhook
+COPY webhooks/hooks.json /etc/webhook/
+COPY scripts/scalingActionUp.sh /var/scripts/
+COPY scripts/scalingActionDown.sh /var/scripts/
+RUN chmod 755 /var/scripts/*
+CMD ["-verbose", "-hooks=/etc/webhook/hooks.json", "-hotreload"]
+ENTRYPOINT ["/bin/webhook"]
+```
+The final look of the webhook directory will look like this:
+```
+[opc@bastion1 webhook]$ find . -type f -printf "%p\n"
+./apps/webhook
+./webhooks/hooks.json
+./scripts/scalingActionUp.sh
+./scripts/scalingActionDown.sh
+./webhookKube.yaml
+./Dockerfile.webhook
+```
+Now we need to create docker image that will host the above code, we need to logout from OCIR and login to Docker Hub then later login back to OCIR:
+```
+cd
+cd webhook
+docker logout
+docker login
+docker build -t phx.ocir.io/axrtkaqgdfo8/webhook:latest -f Dockerfile.webhook .
+docker login phx.ocir.io -u axrtkaqgdfo8/oracleidentitycloudservice/john.p.smith@testing.com
+docker push phx.ocir.io/axrtkaqgdfo8/webhook:latest
+```
+This will add new repository in the OCIR, phx.ocir.io/axrtkaqgdfo8/webhook, then we need to create new pod in the kubernetes, below is the yaml file and here is the executions:
+ ```
+kubectl apply -f webhookKube.yaml
+```
+Check the POD and Service that being deployed:
+```
+[opc@bastion1 webhook]$ kubectl get po -n monitoring -o wide
+NAME                                             READY   STATUS    RESTARTS   AGE     IP            NODE        NOMINATED NODE   READINESS GATES
+webhook-7c6d986484-vrdn5                         1/1     Running   0          84m     10.244.1.20   10.0.10.8   <none>           <none>
+
+[opc@bastion1 webhook]$ kubectl get svc -n monitoring
+NAME                            TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)        AGE
+webhook                         ClusterIP   10.96.84.144   <none>        9000/TCP       85m
+```
+ 
 #### Setting Up Prometheus ####
 First we clone Github repo from Oracle WebLogic Monitoring Exporter:
 ```
@@ -164,54 +390,46 @@ cd
 git clone https://github.com/oracle/weblogic-monitoring-exporter.git
 cd weblogic-monitoring-exporter/samples/kubernetes/end2end/
 ```
-Then check parameter values in prometheus/values.yaml to be like this:
+Then check parameter values in prometheus/values.yaml to be like the one in this [repo](https://github.com/tazlambert/weblogic-modernization/blob/master/artifacts/source/prometheusValues.yaml), it can be divided into 3 parts, first is for prometheus alertmanager on what to do if alert is received, for this labs we call webhook service that we created above:
 ```
-serviceAccounts:
-  pushgateway:
-    create: false
-
-pushgateway:
-  enabled: false
-
-alertmanager:
-  enabled: true
-  persistentVolume:
-    existingClaim: pvc-alertmanager
-  service:
-    type: NodePort
-    nodePort: 32000
-  securityContext:
-    runAsNonRoot: false
-    runAsUser: 0
-
-server:
-  persistentVolume:
-    existingClaim: pvc-prometheus
-  service:
-    type: NodePort
-    nodePort: 30000
-  securityContext:
-    runAsNonRoot: false
-    runAsUser: 0
-
 alertmanagerFiles:
   alertmanager.yml:
     global:
       resolve_timeout: 5m
       #http_config:
        # proxy_url: 'http://www-proxy-hqdc.us.oracle.com:80'
-
     route:
       group_by: ['alertname']
       group_wait: 10s
       group_interval: 10s
       repeat_interval: 1h
-      receiver: 'logging-webhook'
+      receiver: 'web.hook'
+      routes:
+      - match:
+          alertname: ScaleUpNotification
+        receiver: web.hook.scaleup
+      - match:
+          alertname: ScaleDownNotification
+        receiver: web.hook.scaledown
     receivers:
-      - name: 'logging-webhook'
-        webhook_configs:
-        - url: 'http://webhook.webhook.svc.cluster.local:8080/log'
-
+    - name: 'web.hook.scaleup'
+      webhook_configs:
+      - url: 'http://10.96.84.144:9000/hooks/scaleup'
+    - name: 'web.hook.scaledown'
+      webhook_configs:
+      - url: 'http://10.96.84.144:9000/hooks/scaledown'
+    - name: 'web.hook'
+      webhook_configs:
+      - url: 'http://10.96.84.144:9000/hooks'
+    inhibit_rules:
+      - source_match:
+          severity: 'critical'
+        target_match:
+          severity: 'warning'
+        equal: ['alertname', 'dev', 'instance']
+```
+Below is the second part where prometheus will evaluate the metrics that we define here to trigger alert to be sent to alertmanager, in this the alert is if web open sessions current count is more than 15:
+```
 serverFiles:
   alerts:
     groups:
@@ -241,7 +459,9 @@ serverFiles:
             annotations:
               description: 'Scale up when current sessions is greater than 15.'
               summary: 'Firing alert when total sessions active greater than 15.'
-
+```
+The last part is the configuration to gather which WebLogic doamin where the metrics will be used for the prometheus above:
+```
 extraScrapeConfigs: |
     - job_name: 'wls-k8s-domain'
       kubernetes_sd_configs:
@@ -491,150 +711,5 @@ Expected result will be:
 We can try to login to Grafana dashboard and it will show this welcome page and click the WebLogic Server Dashboard;
 ![alt text](images/progra/grafana_welcome.png)
 
-Since there are no WebLogic Domain deployed in the Kubernetes it will show N/A
+And later will show WebLogic Domain deployed in the Kubernetes
 ![alt text](images/progra/grafana_dash.png)
-
-#### Setup Webhook as Notification Receiver ####
-Let's set up a simple webhook as the notification receiver. The webhook is written in a Python script which simply logs all the received notifications. Typically, webhook receivers are often used to notify systems that Alertmanager doesn’t support directly, the script will look like this:
-```
-# Copyright 2019, Oracle Corporation and/or its affiliates. All rights reserved.
-# Licensed under the Universal Permissive License v 1.0 as shown at http://oss.oracle.com/licenses/upl.
-
-import json
-from http.server import BaseHTTPRequestHandler
-from http.server import HTTPServer
-
-class LogHandler(BaseHTTPRequestHandler):
-    def do_POST(self):
-        print
-        self.send_response(200)
-        self.end_headers()
-        if 'Content-Type' in self.headers and self.headers['Content-Type'] == 'application/json':
-          if 'Content-Length' not in self.headers:
-            print('Receiving a json request, but not an alert.')
-            return
-          length = int(self.headers['Content-Length'])
-          data = json.loads(self.rfile.read(length).decode('utf-8'))
-          for alert in data["alerts"]:
-            print('!!! Receiving an alert.')
-            print(json.dumps(alert, indent=2))
-        else:
-          print('Receiving a non-json post.')
-
-
-PORT = 8080
-
-if __name__ == '__main__':
-   httpd = HTTPServer(('', PORT), LogHandler)
-   print ('Webhook is serving at port', PORT)
-   httpd.serve_forever()
-```
-Now we need to create docker image that will host the above code:
-```
-[opc@bastion1 end2end]$ docker build ./webhook -t webhook-log:1.0 -t phx.ocir.io/axrtkaqgdfo8/webhook-log:1.0
-Sending build context to Docker daemon  6.144kB
-Step 1/4 : FROM python:3.7
-Trying to pull repository docker.io/library/python ...
-3.7: Pulling from docker.io/library/python
-90fe46dd8199: Pull complete
-35a4f1977689: Pull complete
-bbc37f14aded: Pull complete
-74e27dc593d4: Pull complete
-4352dcff7819: Pull complete
-deb569b08de6: Pull complete
-1aa33568be24: Pull complete
-a8034acd5893: Pull complete
-5ae88975c1eb: Pull complete
-Digest: sha256:0032cd9c0542133c8c9dc79fb25992203b6dd2bf4c9ff9f6b5f09298061a867c
-Status: Downloaded newer image for python:3.7
- ---> 84d66a048f90
-Step 2/4 : WORKDIR /usr/src/app
- ---> Running in 24eab6cb6aac
-Removing intermediate container 24eab6cb6aac
- ---> c7dcf0c04e38
-Step 3/4 : COPY scripts/* ./
- ---> 89c3a066a327
-Step 4/4 : CMD ["python", "-u", "./server.py"]
- ---> Running in 75cdd30a1656
-Removing intermediate container 75cdd30a1656
- ---> ebf080d866b0
-Successfully built ebf080d866b0
-Successfully tagged webhook-log:1.0
-Successfully tagged phx.ocir.io/axrtkaqgdfo8/webhook-log:1.0
-[opc@bastion1 end2end]$ docker push phx.ocir.io/axrtkaqgdfo8/webhook-log:1.0
-The push refers to repository [phx.ocir.io/axrtkaqgdfo8/webhook-log]
-8027486a1048: Pushed
-8a899b0b4f1a: Pushed
-fc5f48f1ecdc: Pushed
-86120ec29f78: Pushed
-5d34cecc2826: Pushed
-baf481fca4b7: Pushed
-3d3e92e98337: Pushed
-8967306e673e: Pushed
-9794a3b3ed45: Pushed
-5f77a51ade6a: Pushed
-e40d297cf5f8: Pushed
-1.0: digest: sha256:2179c7005923c32ba9fcf1290e3d62c008860f079823a859afd20231d75f2980 size: 2631
-```
-This will add new repository in the OCIR, phx.ocir.io/axrtkaqgdfo8/webhook-log, then we need to create new pod in the kubernetes, below is the yaml file:
-```
-# Copyright 2017, 2019, Oracle Corporation and/or its affiliates. All rights reserved.
-# Licensed under the Universal Permissive License v 1.0 as shown at http://oss.oracle.com/licenses/upl.
-
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: webhook
-  namespace: webhook
-  labels:
-    app: webhook
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: webhook
-  template:
-    metadata:
-      labels:
-        app: webhook
-    spec:
-      containers:
-      - image: phx.ocir.io/axrtkaqgdfo8/webhook-log:1.0
-        imagePullPolicy: Always
-        name: webhook
-      imagePullSecrets:
-      - name: ocirwebhooksecret
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: webhook
-  namespace: webhook
-  labels:
-    app: webhook
-spec:
-  ports:
-  - port: 8080
-    protocol: TCP
-  selector:
-    app: webhook
- ```
-The value in the image parameter can be replaced with the one in the OCIR, but we need to create the secret that can access the OCIR
- ```
-[opc@bastion1 end2end]$ kubectl create ns webhook
-namespace/webhook created
-[opc@bastion1 end2end]$ kubectl create secret docker-registry ocirwebhooksecret -n webhook --docker-server=phx.ocir.io --docker-username='axrtkaqgdfo8/oracleidentitycloudservice/john.p.smith@testing.com' --docker-password='xxxxxxx' --docker-email='john.p.smith@testing.com'
- ```
-and here is the executions:
- ```
-[opc@bastion1 end2end]$ kubectl apply -f ./webhook/server.yaml
-deployment.apps/webhook created
-service/webhook created
-[opc@bastion1 end2end]$ kubectl -n webhook get pod -l app=webhook
-NAME                       READY   STATUS    RESTARTS   AGE
-webhook-774c7f9c47-bz85n   1/1     Running   0          2m16s
-[opc@bastion1 end2end]$ kubectl -n webhook get svc -l app=webhook
-NAME      TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)    AGE
-webhook   ClusterIP   10.96.56.3   <none>        8080/TCP   2m28s
- ```
-After this everything already done and can continue with WebLogic Domain deployment.
