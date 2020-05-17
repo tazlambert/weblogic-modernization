@@ -118,11 +118,9 @@ wls-k8s-domain-managed-server4   1/1     Running   0          79s   10.244.1.9  
 ```
 With this REST Enabled WebLogic Operator the possibility to automate and integrate with WLDF and Prometheus are possible.
 
-# Auto Scaling WebLogic Cluster using WLDF #
+#### Auto Scaling WebLogic Cluster using WLDF ####
 
-#### Scaling WebLogic cluster ####
-
-The WebLogic Diagnostics Framework (WLDF) is a suite of services and APIs that collect and surface metrics that provide visibility into server and application performance. To support automatic scaling of WebLogic clusters in Kubernetes, WLDF provides the Policies and Actions component, which lets you write policy expressions for automatically executing scaling operations on a cluster. These policies monitor one or more types of WebLogic Server metrics, such as memory, idle threads, and CPU load. When the configured threshold in a policy is met, the policy is triggered, and the corresponding scaling action is executed. The WebLogic Server Kubernetes Operator project provides a shell script, scalingAction.sh, for use as a Script Action, which illustrates how to issue a request to the operator’s REST endpoint.
+The WebLogic Diagnostics Framework (WLDF) is a suite of services and APIs that collect and surface metrics that provide visibility into server and application performance. To support automatic scaling of WebLogic clusters in Kubernetes, WLDF provides the Policies and Actions component, which lets you write policy expressions for automatically executing scaling operations on a cluster. These policies monitor one or more types of WebLogic Server metrics, such as memory, idle threads, and CPU load. When the configured threshold in a policy is met, the policy is triggered, and the corresponding scaling action is executed. The WebLogic Server Kubernetes Operator project provides a shell script, scalingAction.sh, for use as a Script Action, which illustrates how to issue a request to the operator’s REST endpoint. If this configuration is done on Domain-in-Image this will be **gone**, so if want to make the configuration permanent then need to update the existing docker image with this config or do it on Domain-on-PV.
 
 For this labs we are going to monitor http sessions of testwebapp application that we deploy to scale up or scale down and we are going to copy the original scalingAction.sh into 2 shell script; one is to scale up, scalingActionUp.sh, and one to scale down, scalingActionDown.sh. Here is the original parameter (line 7-17) that is needed to be change:
 ```
