@@ -766,11 +766,11 @@ wls-k8s-domain-managed-server2   1/1     Running   0          23m
 ```
 Now try to hit loadTest.sh several times, and we can see the traffic of the specified metrics going up:
 
-![alt text](images/progra/autosacle1.png)
+![alt text](images/progra/autoscale1.png)
 
 And alert has been produced:
 
-![alt text](images/progra/autosacle2.png)
+![alt text](images/progra/autoscale2.png)
 
 Then we check the number of pod or MS again:
 ```
