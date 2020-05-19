@@ -363,6 +363,10 @@ docker build -t phx.ocir.io/axrtkaqgdfo8/webhook:latest -f Dockerfile.webhook .
 docker login phx.ocir.io -u axrtkaqgdfo8/oracleidentitycloudservice/john.p.smith@testing.com
 docker push phx.ocir.io/axrtkaqgdfo8/webhook:latest
 ```
+Before applying the webhookKube.yaml we need to create scret to access webhook repo in OCIR:
+```
+kubectl create secret docker-registry ocirwebhooksecret -n monitoring --docker-server=nrt.ocir.io --docker-username='nr2wduco0qov/oracleidentitycloudservice/john.p.smith@testing.com' --docker-password='take-from-the-same-ocir-weblogic' --docker-email='john.p.smith@testing.com'
+```
 This will add new repository in the OCIR, phx.ocir.io/axrtkaqgdfo8/webhook, then we need to create new pod in the kubernetes, below is the yaml file and here is the executions:
  ```
 kubectl apply -f webhookKube.yaml
@@ -377,7 +381,11 @@ webhook-7c6d986484-vrdn5                         1/1     Running   0          84
 NAME                            TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)        AGE
 webhook                         ClusterIP   10.96.84.144   <none>        9000/TCP       85m
 ```
- 
+Above service can called from inside OKE cluster using nameservice as explained in [this article](https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/):
+```
+http://webhook.monitoring.svc.cluster.local:9000/hooks/scaleup
+http://webhook.monitoring.svc.cluster.local:9000/hooks/scaledown
+```
 #### Setting Up Prometheus ####
 First we clone Github repo from Oracle WebLogic Monitoring Exporter:
 ```
@@ -398,7 +406,7 @@ alertmanagerFiles:
       group_wait: 10s
       group_interval: 10s
       repeat_interval: 1h
-      receiver: 'web.hook'
+      receiver: 'web.hook.scaleup'
       routes:
       - match:
           alertname: ScaleUpNotification
@@ -409,13 +417,10 @@ alertmanagerFiles:
     receivers:
     - name: 'web.hook.scaleup'
       webhook_configs:
-      - url: 'http://10.96.84.144:9000/hooks/scaleup'
+      - url: 'http://webhook.monitoring.svc.cluster.local:9000/hooks/scaleup'
     - name: 'web.hook.scaledown'
       webhook_configs:
-      - url: 'http://10.96.84.144:9000/hooks/scaledown'
-    - name: 'web.hook'
-      webhook_configs:
-      - url: 'http://10.96.84.144:9000/hooks'
+      - url: 'http://webhook.monitoring.svc.cluster.local:9000/hooks/scaledown'
     inhibit_rules:
       - source_match:
           severity: 'critical'
@@ -452,8 +457,8 @@ serverFiles:
             labels:
               severity: page
             annotations:
-              description: 'Scale up when current sessions is greater than 15.'
-              summary: 'Firing alert when total sessions active greater than 15.'
+              description: 'Scale down when current sessions is less than 15.'
+              summary: 'Firing alert when total sessions active less than 15.'
 ```
 The last part is the configuration to gather which WebLogic doamin where the metrics will be used for the prometheus above:
 ```
@@ -632,13 +637,13 @@ This will be done by creating a datasource for Grafana, this will make Prometheu
 {
   "name":"Prometheus",
   "type":"prometheus",
-  "url":"http://10.0.10.2:30000",
+  "url":"http://prometheus.monitoring.svc.cluster.local",
   "access":"proxy",
   "isDefault":true,
   "basicAuth":false
 }
 ```
-Make sure the URL point to the correct Node IP and Node Port of Prometheus Server, then to apply this we can use this command:
+Make sure the URL point to the correct Node IP and Node Port of Prometheus Server, then to apply this we can use this command, please do not forget to **change the IP address of grafana**:
 ```
 curl -v -H 'Content-Type: application/json' -H "Content-Type: application/json" -X POST http://admin:welcome1@10.0.10.4:31000/api/datasources/ --data-binary @grafana/datasource.json
 ```
@@ -711,7 +716,7 @@ And later will show WebLogic Domain deployed in the Kubernetes
 
 #### Testing Monitoring Tools ####
 
-Beside that we can check from all the monitoring system that was craeted before from the bastion host, we can check from ELK stack especially Kibana to know if the log already being sent to the Elasticsearch or not, of course we need to [create additional index pattern](https://github.com/tazlambert/weblogic-modernization/blob/master/tutorials/setup.wko.md#elk-log-index-creation) (wls)
+Now we can check from all the monitoring system that was craeted before from the bastion host, we can check from ELK stack especially Kibana to know if the log already being sent to the Elasticsearch or not, of course we need to [create additional index pattern](https://github.com/tazlambert/weblogic-modernization/blob/master/tutorials/setup.wko.md#elk-log-index-creation) (wls)
 
 ![alt text](images/deploy.domain/domainKibana.png)
 
