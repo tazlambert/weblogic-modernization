@@ -39,7 +39,7 @@ alertmanagerFiles:
       group_wait: 10s
       group_interval: 10s
       repeat_interval: 1h
-      receiver: 'web.hook'
+      receiver: 'web.hook.scaleup'
       routes:
       - match:
           alertname: ScaleUpNotification
@@ -50,13 +50,10 @@ alertmanagerFiles:
     receivers:
     - name: 'web.hook.scaleup'
       webhook_configs:
-      - url: 'http://10.96.224.117:9000/hooks/scaleup'
+      - url: 'http://webhook.monitoring.svc.cluster.local:9000/hooks/scaleup'
     - name: 'web.hook.scaledown'
       webhook_configs:
-      - url: 'http://10.96.224.117:9000/hooks/scaledown'
-    - name: 'web.hook'
-      webhook_configs:
-      - url: 'http://10.96.224.117:9000/hooks'
+      - url: 'http://webhook.monitoring.svc.cluster.local:9000/hooks/scaledown'
     inhibit_rules:
       - source_match:
           severity: 'critical'
