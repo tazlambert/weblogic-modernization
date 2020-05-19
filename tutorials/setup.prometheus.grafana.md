@@ -637,7 +637,7 @@ This will be done by creating a datasource for Grafana, this will make Prometheu
 {
   "name":"Prometheus",
   "type":"prometheus",
-  "url":"http://prometheus.monitoring.svc.cluster.local",
+  "url":"http://10.0.10.13:30000",
   "access":"proxy",
   "isDefault":true,
   "basicAuth":false
@@ -645,18 +645,18 @@ This will be done by creating a datasource for Grafana, this will make Prometheu
 ```
 Make sure the URL point to the correct Node IP and Node Port of Prometheus Server, then to apply this we can use this command, please do not forget to **change the IP address of grafana**:
 ```
-curl -v -H 'Content-Type: application/json' -H "Content-Type: application/json" -X POST http://admin:welcome1@10.0.10.4:31000/api/datasources/ --data-binary @grafana/datasource.json
+curl -v -H 'Content-Type: application/json' -H "Content-Type: application/json" -X POST http://admin:welcome1@10.0.10.12:31000/api/datasources/ --data-binary @grafana/datasource.json
 ```
 Expected result will be:
 ```
-* About to connect() to 10.0.10.4 port 31000 (#0)
-*   Trying 10.0.10.4...
-* Connected to 10.0.10.4 (10.0.10.4) port 31000 (#0)
+* About to connect() to 10.0.10.12 port 31000 (#0)
+*   Trying 10.0.10.12...
+* Connected to 10.0.10.12 (10.0.10.12) port 31000 (#0)
 * Server auth using Basic with user 'admin'
 > POST /api/datasources/ HTTP/1.1
 > Authorization: Basic YWRtaW46d2VsY29tZTE=
 > User-Agent: curl/7.29.0
-> Host: 10.0.10.4:31000
+> Host: 10.0.10.12:31000
 > Accept: */*
 > Content-Type: application/json
 > Content-Type: application/json
@@ -672,23 +672,23 @@ Expected result will be:
 < Date: Mon, 04 May 2020 09:50:29 GMT
 < Content-Length: 398
 <
-* Connection #0 to host 10.0.10.4 left intact
-{"datasource":{"id":2,"orgId":1,"name":"Prometheus","type":"prometheus","typeLogoUrl":"","access":"proxy","url":"http://10.0.10.2:30000","password":"","user":"","database":"","basicAuth":false,"basicAuthUser":"","basicAuthPassword":"","withCredentials":false,"isDefault":true,"jsonData":{},"secureJsonFields":{},"version":1,"readOnly":false},"id":2,"message":"Datasource added","name":"Prometheus"}
+* Connection #0 to host 10.0.10.12 left intact
+{"datasource":{"id":2,"orgId":1,"name":"Prometheus","type":"prometheus","typeLogoUrl":"","access":"proxy","url":"http://10.0.10.12:30000","password":"","user":"","database":"","basicAuth":false,"basicAuthUser":"","basicAuthPassword":"","withCredentials":false,"isDefault":true,"jsonData":{},"secureJsonFields":{},"version":1,"readOnly":false},"id":2,"message":"Datasource added","name":"Prometheus"}
 ```
 After that we will configure the dashboard that already created to show WebLogic Metrics:
 ```
-curl -v -H 'Content-Type: application/json' -H "Content-Type: application/json" -X POST http://admin:welcome1@10.0.10.4:31000/api/dashboards/db --data-binary @grafana/dashboard.json
+curl -v -H 'Content-Type: application/json' -H "Content-Type: application/json" -X POST http://admin:welcome1@10.0.10.12:31000/api/dashboards/db --data-binary @grafana/dashboard.json
 ```
 Expected result will be:
 ```
-* About to connect() to 10.0.10.4 port 31000 (#0)
-*   Trying 10.0.10.4...
-* Connected to 10.0.10.4 (10.0.10.4) port 31000 (#0)
+* About to connect() to 10.0.10.12 port 31000 (#0)
+*   Trying 10.0.10.12...
+* Connected to 10.0.10.12 (10.0.10.12) port 31000 (#0)
 * Server auth using Basic with user 'admin'
 > POST /api/dashboards/db HTTP/1.1
 > Authorization: Basic YWRtaW46d2VsY29tZTE=
 > User-Agent: curl/7.29.0
-> Host: 10.0.10.4:31000
+> Host: 10.0.10.12:31000
 > Accept: */*
 > Content-Type: application/json
 > Content-Type: application/json
@@ -705,7 +705,7 @@ Expected result will be:
 < Date: Mon, 04 May 2020 09:54:19 GMT
 < Content-Length: 139
 <
-* Connection #0 to host 10.0.10.4 left intact
+* Connection #0 to host 10.0.10.12 left intact
 {"id":1,"slug":"weblogic-server-dashboard","status":"success","uid":"3-2eDbeZk","url":"/d/3-2eDbeZk/weblogic-server-dashboard","version":1}
 ```
 We can try to login to Grafana dashboard and it will show this welcome page and click the WebLogic Server Dashboard;
