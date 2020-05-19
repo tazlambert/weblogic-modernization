@@ -708,11 +708,6 @@ Expected result will be:
 * Connection #0 to host 10.0.10.12 left intact
 {"id":1,"slug":"weblogic-server-dashboard","status":"success","uid":"3-2eDbeZk","url":"/d/3-2eDbeZk/weblogic-server-dashboard","version":1}
 ```
-We can try to login to Grafana dashboard and it will show this welcome page and click the WebLogic Server Dashboard;
-![alt text](images/progra/grafana_welcome.png)
-
-And later will show WebLogic Domain deployed in the Kubernetes
-![alt text](images/progra/grafana_dash.png)
 
 #### Testing Monitoring Tools ####
 
@@ -729,3 +724,60 @@ And in the end all those metrics will displayed into Grafana like below:
 ![alt text](images/deploy.domain/domainGrafana.png)
 
 While for the Admin Console and the test application itself it can be tested after ingress and load balancer configured
+
+#### Testing Auto Scaling ####
+
+To test it we need to create simple shell script loadTest.sh using curl to access the load balancer:
+```
+#!/bin/bash
+
+COUNTER=0
+MAXCURL=17
+while [ $COUNTER -lt $MAXCURL ]; do
+OUTPUT="$(curl http://$1/opdemo/)"
+if [ "$OUTPUT" != "404 page not found" ]; then
+echo $OUTPUT
+let COUNTER=COUNTER+1
+sleep 1
+fi
+done
+```
+Get the load balancer EXTERNAL-IP address using:
+```
+kubectl get svc -n ingress-nginx
+```
+Then we can run the loadTest.sh script:
+```
+./loadTest.sh 168.138.219.15
+```
+It will show repeatedly this:
+```
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   368  100   368    0     0    187      0  0:00:01  0:00:01 --:--:--   187
+<!DOCTYPE html> <html> <body> <h1>WebLogic Operator Demo App - MBean properties: ???</h1><br> <b>Server time:</b> 04:26:00<br><b>Hostname:</b> wls-k8s-domain-managed-server2<br><h2>Datasource properties</h2> <p><font color="red">No datasource name provided.</font><br><font color="red">Append ?dsname=YOUR_DATA_SOURCE_NAME to the URL.</font></p> </body> </html>
+```
+Now the number of pod or MS for this domain show:
+```
+NAME                             READY   STATUS    RESTARTS   AGE
+wls-k8s-domain-admin-server      1/1     Running   0          78m
+wls-k8s-domain-managed-server1   1/1     Running   0          77m
+wls-k8s-domain-managed-server2   1/1     Running   0          23m
+```
+Now try to hit loadTest.sh several times, and we can see the traffic of the specified metrics going up:
+
+![alt text](images/progra/autosacle1.png)
+
+And alert has been produced:
+
+![alt text](images/progra/autosacle2.png)
+
+Then we check the number of pod or MS again:
+```
+NAME                             READY   STATUS    RESTARTS   AGE
+wls-k8s-domain-admin-server      1/1     Running   0          83m
+wls-k8s-domain-managed-server1   1/1     Running   0          82m
+wls-k8s-domain-managed-server2   1/1     Running   0          29m
+wls-k8s-domain-managed-server3   1/1     Running   0          3m26s
+```
+We can see that the third node Age is just 3 minutes which is a sign that this is new pod or MS.
