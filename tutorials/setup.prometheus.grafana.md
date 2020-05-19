@@ -46,6 +46,7 @@ Open the access to bastion then put this command to create PV and PVC for Promet
 ```
 kubectl create namespace monitoring
 ```
+Do not forget to **change IP of NFS Server**
 ```
 cat << EOF | kubectl apply -f -
 apiVersion: v1
@@ -62,14 +63,12 @@ spec:
   nfs:
     server: 10.0.10.9
     path: "/shared/alert"
-
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: pvc-alertmanager
   namespace: monitoring
-
 spec:
   storageClassName: alertmanager
   resources:
@@ -79,7 +78,7 @@ spec:
     - ReadWriteOnce
 EOF
 ```
-Next is for Prometheus PV and PVC:
+Next is for Prometheus PV and PVC, do not forget to **change IP of NFS Server**:
 ```
 cat << EOF | kubectl apply -f -
 apiVersion: v1
@@ -96,14 +95,12 @@ spec:
   nfs:
     server: 10.0.10.9
     path: "/shared/prometheus"
-
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: pvc-prometheus
   namespace: monitoring
-
 spec:
   storageClassName: prometheus
   resources:
@@ -120,13 +117,13 @@ sudo mount 10.0.10.9:/shared/grafana /mnt/grafana
 sudo mkdir /mnt/grafana/root
 sudo chmod -Rf 777 /mnt/grafana/root
 ```
+Do not forget to **change IP of NFS Server**
 ```
 cat << EOF | kubectl apply -f -
 apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: pv-grafana
-
 spec:
   storageClassName: grafana
   capacity:
@@ -137,14 +134,12 @@ spec:
   nfs:
     server: 10.0.10.9
     path: "/shared/grafana/root"
-
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: pvc-grafana
   namespace: monitoring
-
 spec:
   storageClassName: grafana
   resources:
