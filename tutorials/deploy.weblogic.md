@@ -301,18 +301,3 @@ Ready to call operator REST APIs
   ]
 }
 ```
-#### Testing Monitoring Tools ####
-
-Beside that we can check from all the monitoring system that was craeted before from the bastion host, we can check from ELK stack especially Kibana to know if the log already being sent to the Elasticsearch or not, of course we need to [create additional index pattern](https://github.com/tazlambert/weblogic-modernization/blob/master/tutorials/setup.wko.md#elk-log-index-creation) (wls)
-
-![alt text](images/deploy.domain/domainKibana.png)
-
-While for Prometheus we can check from the dashboard that we can see the metrics from WebLogic:
-
-![alt text](images/deploy.domain/domainPrometheus.png)
-
-And in the end all those metrics will displayed into Grafana like below:
-
-![alt text](images/deploy.domain/domainGrafana.png)
-
-While for the Admin Console and the test application itself it can be tested after ingress and load balancer configured
